@@ -34,6 +34,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* スクロールバーの有無でヘッダー/フッターが左右にズレるのを防ぐ */
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 body {
@@ -73,23 +76,36 @@ img {
 .theme-toggle {
   flex: none;
   margin-top: 4px;
-  width: 40px;
-  height: 40px;
+  height: 34px;
+  padding: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--card);
-  color: var(--text);
-  font-size: 18px;
-  line-height: 1;
   cursor: pointer;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  transition: border-color 0.15s;
 }
 
 .theme-toggle:hover {
   border-color: var(--text-muted);
+}
+
+.theme-toggle .tt-opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-toggle .tt-opt.is-active {
+  background: var(--accent);
+  color: #fff;
 }
 
 .site-home {

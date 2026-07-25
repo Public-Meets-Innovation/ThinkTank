@@ -7,7 +7,7 @@
   <script>
   (function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
   </script>
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
   <header class="site-header">
@@ -18,14 +18,13 @@
           PMI ThinkTank Blog
         </a>
       </div>
-      <button class="theme-toggle" type="button" aria-label="ダークモード切り替え">🌙</button>
+      <button class="theme-toggle" type="button" role="switch" aria-label="ライト/ダーク切り替え"><span class="tt-opt" data-mode="L">L</span><span class="tt-opt" data-mode="D">D</span></button>
     </div>
   </header>
   <article class="article">
     <a href="index.html" class="article__back">← ブログ一覧へ戻る</a>
     <h1 class="article__title">U40世代が感じる“負担”と“閉塞”――世代対立では捉えきれない政治不信」とか「「高齢者との対立」ではない——U40世代に広がる“負担感”と“閉塞感”の正体</h1>
     <div class="article__meta">論考 ・ 2026年2月2日</div>
-    <div class="article__hero"><img src="images/nbe7f2210fe7f_d4a2f3577f2a029fe6f640e3c5c22880.png" alt="" /></div>
     <div class="article__body">
 <p><img alt="" src="images/nbe7f2210fe7f_d4a2f3577f2a029fe6f640e3c5c22880.png" /></p>
 <p>一般社団法人Public Meets Innovationでは、政治意識に関するインターネット調査を実施した。調査期間は2026年1月9日から1月10日、日本全国の19歳以上3000人を対象としている。</p>
@@ -95,13 +94,20 @@
     var btn=document.querySelector('.theme-toggle');
     if(!btn)return;
     function cur(){return document.documentElement.getAttribute('data-theme')||'light';}
-    function icon(){btn.textContent = cur()==='dark' ? '☀️' : '🌙';}
-    icon();
-    btn.addEventListener('click',function(){
-      var next = cur()==='dark' ? 'light' : 'dark';
+    function render(){
+      var d=cur()==='dark';
+      var L=btn.querySelector('[data-mode=\"L\"]'), D=btn.querySelector('[data-mode=\"D\"]');
+      if(L)L.classList.toggle('is-active',!d);
+      if(D)D.classList.toggle('is-active',d);
+    }
+    render();
+    btn.addEventListener('click',function(e){
+      var opt=e.target.closest('[data-mode]');
+      var next = opt ? (opt.getAttribute('data-mode')==='D'?'dark':'light')
+                     : (cur()==='dark'?'light':'dark');
       document.documentElement.setAttribute('data-theme',next);
       try{localStorage.setItem('theme',next);}catch(e){}
-      icon();
+      render();
     });
   })();
   </script>
