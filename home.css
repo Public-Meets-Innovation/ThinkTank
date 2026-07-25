@@ -103,7 +103,7 @@ img { max-width: 100%; height: auto; }
 /* ===== About ===== */
 .about__lead {
   font-size: 19px;
-  max-width: 44em;
+  max-width: 820px;
   line-break: strict;
   word-break: auto-phrase;
   text-wrap: pretty;
@@ -123,7 +123,7 @@ img { max-width: 100%; height: auto; }
   font-size: 17px;
   color: #333;
   margin-bottom: 20px;
-  max-width: 46em;
+  max-width: 820px;
   /* 日本語を文節単位で自然に折り返す（未対応ブラウザは通常折り返しにフォールバック） */
   line-break: strict;
   word-break: auto-phrase;
