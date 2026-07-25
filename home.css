@@ -117,19 +117,10 @@ img { max-width: 100%; height: auto; }
   max-width: 46em;
 }
 .message__sign {
-  margin-top: 40px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
+  margin-top: 56px;
 }
-.message__sign .role { font-size: 14px; color: var(--text-muted); }
-.message__sign .name { font-size: 22px; font-weight: 700; margin-top: 4px; }
-.message__bio {
-  margin-top: 18px;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.95;
-  max-width: 48em;
-}
+.message__sign .role { font-size: 17px; color: var(--text-muted); }
+.message__sign .name { font-size: 27px; font-weight: 700; margin-top: 6px; }
 
 /* ===== Latest posts ===== */
 .home-cards {
