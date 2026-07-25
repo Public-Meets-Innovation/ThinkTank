@@ -2,17 +2,26 @@
 
 Markdownで記事を書き、`build.py` を実行するとHTMLが生成される静的ブログです。
 
-## フォルダ構成
+## サイト全体の構成
 
 ```
-pmi-thinktank-blog/
-├─ posts/          ← 記事の本体（.md）。ここだけ触ればOK
-├─ images/         ← サムネイル・図版
-├─ build.py        ← 実行するとHTMLを生成
-├─ style.css       ← デザイン
-├─ index.html      ← 自動生成（直接編集しない）
-└─ *.html          ← 各記事ページ（自動生成）
+pmi-thinktank/                 ← リポジトリ／サイトのルート
+├─ index.html                  ← トップページ（自動生成。編集は index.template.html を）
+├─ index.template.html         ← トップページの雛形（ヒーロー・About・お問い合わせ）
+├─ home.css                    ← トップページのデザイン
+├─ requirements.txt
+├─ .github/workflows/deploy.yml← push で自動ビルド＆公開
+└─ blog/                       ← ブログ（/blog/ で公開）
+   ├─ posts/                   ← 記事の本体（.md）。ここだけ触ればOK
+   ├─ images/                  ← サムネイル・図版
+   ├─ build.py                 ← 実行するとブログ＋トップページを生成
+   ├─ style.css                ← ブログのデザイン
+   ├─ index.html               ← 一覧（自動生成）
+   └─ *.html                   ← 各記事ページ（自動生成）
 ```
+
+`python blog/build.py` を実行すると、ブログの各ページに加えて
+トップページ（ルート `index.html`）の「最新の記事」も自動更新されます。
 
 ## 記事を追加する手順
 

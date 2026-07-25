@@ -50,12 +50,23 @@ img {
   margin: 0 auto;
 }
 
+.site-home {
+  display: inline-block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.site-home:hover {
+  color: var(--text);
+}
+
 .logo {
   font-size: 44px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
-  display: inline-block;
+  display: block;
 }
 
 .logo .dot {
