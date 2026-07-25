@@ -123,12 +123,9 @@ img { max-width: 100%; height: auto; }
   font-size: 17px;
   color: #333;
   margin-bottom: 20px;
-  /* 調査・論考・解説のカード列と同じ全幅に揃える */
+  /* 調査・論考・解説のカード列と同じ全幅に揃え、行を右端まで詰める */
   max-width: none;
-  /* 日本語を文節単位で自然に折り返す（未対応ブラウザは通常折り返しにフォールバック） */
   line-break: strict;
-  word-break: auto-phrase;
-  text-wrap: pretty;
 }
 .message__sign {
   margin-top: 56px;
