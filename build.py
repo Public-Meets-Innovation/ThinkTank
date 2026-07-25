@@ -49,7 +49,9 @@ def nav_html():
     items = []
     for i, c in enumerate(CATEGORIES):
         cls = ' class="is-active"' if i == 0 else ""
-        items.append(f'    <a href="#"{cls}>{html.escape(c)}</a>')
+        cat_val = "all" if i == 0 else html.escape(c)
+        items.append(
+            f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
 def page(title, body):
@@ -137,7 +139,7 @@ def render_index(posts):
         excerpt = ""
         if p["excerpt"]:
             excerpt = f'      <p class="post__excerpt">{html.escape(p["excerpt"])}</p>\n'
-        cards.append(f"""    <article class="post">
+        cards.append(f"""    <article class="post" data-category="{html.escape(p["category"])}">
       <a href="{link}"><h2 class="post__title">{html.escape(p["title"])}</h2></a>
       <div class="post__meta">
         <span class="post__cat">{html.escape(p["category"])}</span>
@@ -146,10 +148,42 @@ def render_index(posts):
 {thumb}{excerpt}      <a href="{link}" class="post__more">read more</a>
     </article>""")
 
+    empty = '    <p class="post-empty" hidden>このカテゴリの記事はまだありません。</p>'
     body = nav_html() + '\n\n  <main class="post-list">\n' + \
-        "\n\n".join(cards) + "\n  </main>"
+        "\n\n".join(cards) + "\n" + empty + "\n  </main>\n" + FILTER_JS
     (ROOT / "index.html").write_text(
         page("PMI ThinkTank Blog", body), encoding="utf-8")
+
+# 一覧のカテゴリ絞り込み（クリックで表示/非表示を切り替え）
+FILTER_JS = """  <script>
+  (function () {
+    var nav = document.querySelector(".category-nav");
+    var posts = Array.prototype.slice.call(document.querySelectorAll(".post"));
+    var empty = document.querySelector(".post-empty");
+    if (!nav) return;
+
+    function apply(cat) {
+      var shown = 0;
+      posts.forEach(function (el) {
+        var match = cat === "all" || el.getAttribute("data-category") === cat;
+        el.hidden = !match;
+        if (match) shown++;
+      });
+      if (empty) empty.hidden = shown !== 0;
+    }
+
+    nav.addEventListener("click", function (e) {
+      var a = e.target.closest("a[data-cat]");
+      if (!a) return;
+      e.preventDefault();
+      nav.querySelectorAll("a").forEach(function (x) {
+        x.classList.remove("is-active");
+      });
+      a.classList.add("is-active");
+      apply(a.getAttribute("data-cat"));
+    });
+  })();
+  </script>"""
 
 # ---- main -------------------------------------------------------------------
 
