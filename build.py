@@ -28,7 +28,7 @@ def header_html():
     return """  <header class="site-header">
     <div class="site-header__inner">
       <a href="index.html" class="logo">
-        pmi<span class="dot">.</span>thinktank
+        PMI ThinkTank Blog
       </a>
     </div>
   </header>"""
