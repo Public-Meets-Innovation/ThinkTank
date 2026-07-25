@@ -7,7 +7,23 @@
   --line: #ececec;
   --accent: #1a5f7a;
   --bg: #ffffff;
+  --card: #ffffff;
+  --body-text: #333333;
+  --excerpt: #444444;
   --max: 1000px;
+}
+
+/* ダークモード */
+:root[data-theme="dark"] {
+  --text: #eaeaea;
+  --text-muted: #9a9a9a;
+  --text-light: #6a6a6a;
+  --line: #2c2c2c;
+  --accent: #5bb4d6;
+  --bg: #14181b;
+  --card: #1b2024;
+  --body-text: #cfcfcf;
+  --excerpt: #bdbdbd;
 }
 
 * {
@@ -48,6 +64,32 @@ img {
 .site-header__inner {
   max-width: var(--max);
   margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.theme-toggle {
+  flex: none;
+  margin-top: 4px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--text-muted);
 }
 
 .site-home {
@@ -171,7 +213,7 @@ img {
 .post__excerpt {
   margin-top: 20px;
   font-size: 16px;
-  color: #444;
+  color: var(--excerpt);
   max-width: 760px;
 }
 
@@ -261,13 +303,13 @@ img {
 .article__body p {
   margin: 16px 0;
   font-size: 17px;
-  color: #333;
+  color: var(--body-text);
 }
 
 .article__body ul {
   margin: 16px 0 16px 24px;
   font-size: 17px;
-  color: #333;
+  color: var(--body-text);
 }
 
 /* 本文中の画像はカラム幅に収める */

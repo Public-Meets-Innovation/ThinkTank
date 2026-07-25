@@ -28,10 +28,13 @@ CATEGORIES = [
 def header_html():
     return """  <header class="site-header">
     <div class="site-header__inner">
-      <a href="../" class="site-home">← PMI ThinkTank</a>
-      <a href="index.html" class="logo">
-        PMI ThinkTank Blog
-      </a>
+      <div class="site-header__left">
+        <a href="../" class="site-home">← PMI ThinkTank</a>
+        <a href="index.html" class="logo">
+          PMI ThinkTank Blog
+        </a>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="ダークモード切り替え">🌙</button>
     </div>
   </header>"""
 
@@ -40,12 +43,32 @@ def footer_html():
     <div class="site-footer__inner">
       <span>© 2026 PMI ThinkTank</span>
       <div class="social">
-        <a href="#">LinkedIn</a>
-        <a href="#">X (Twitter)</a>
-        <a href="#">note</a>
+        <a href="https://x.com/PMI__official" target="_blank" rel="noopener">Twitter</a>
+        <a href="https://note.com/pmi_thinktank" target="_blank" rel="noopener">note</a>
       </div>
     </div>
   </footer>"""
+
+# テーマ（ライト/ダーク）の適用スクリプト
+THEME_HEAD_JS = """  <script>
+  (function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+  </script>"""
+
+THEME_TOGGLE_JS = """  <script>
+  (function(){
+    var btn=document.querySelector('.theme-toggle');
+    if(!btn)return;
+    function cur(){return document.documentElement.getAttribute('data-theme')||'light';}
+    function icon(){btn.textContent = cur()==='dark' ? '☀️' : '🌙';}
+    icon();
+    btn.addEventListener('click',function(){
+      var next = cur()==='dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme',next);
+      try{localStorage.setItem('theme',next);}catch(e){}
+      icon();
+    });
+  })();
+  </script>"""
 
 def nav_html():
     items = []
@@ -63,12 +86,14 @@ def page(title, body):
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>
-  <link rel="stylesheet" href="style.css" />
+{THEME_HEAD_JS}
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
 {header_html()}
 {body}
 {footer_html()}
+{THEME_TOGGLE_JS}
 </body>
 </html>
 """

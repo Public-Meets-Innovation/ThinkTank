@@ -163,13 +163,13 @@ img { max-width: 100%; height: auto; }
 .footer {
   background: var(--accent-dark);
   color: rgba(255,255,255,0.85);
-  padding: 72px 0 48px;
+  padding: 44px 0 28px;
 }
-.footer h2 { color: #fff; font-size: 26px; margin-bottom: 12px; }
-.footer p { max-width: 40em; }
+.footer h2 { color: #fff; font-size: 24px; margin-bottom: 8px; }
+.footer p { white-space: nowrap; }
 .footer__row {
-  margin-top: 36px;
-  padding-top: 28px;
+  margin-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid rgba(255,255,255,0.18);
   display: flex;
   justify-content: space-between;
@@ -177,6 +177,11 @@ img { max-width: 100%; height: auto; }
   flex-wrap: wrap;
   gap: 16px;
   font-size: 14px;
+}
+
+/* 狭い画面では折り返しを許可（横はみ出し防止） */
+@media (max-width: 640px) {
+  .footer p { white-space: normal; font-size: 15px; }
 }
 .footer__social { display: flex; gap: 22px; }
 .footer__social a { color: #fff; }
