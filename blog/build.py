@@ -34,7 +34,7 @@ def header_html():
           PMI ThinkTank Blog
         </a>
       </div>
-      <button class="theme-toggle" type="button" aria-label="ダークモード切り替え">🌙</button>
+      <button class="theme-toggle" type="button" role="switch" aria-label="ライト/ダーク切り替え"><span class="tt-opt" data-mode="L">L</span><span class="tt-opt" data-mode="D">D</span></button>
     </div>
   </header>"""
 
@@ -59,13 +59,20 @@ THEME_TOGGLE_JS = """  <script>
     var btn=document.querySelector('.theme-toggle');
     if(!btn)return;
     function cur(){return document.documentElement.getAttribute('data-theme')||'light';}
-    function icon(){btn.textContent = cur()==='dark' ? '☀️' : '🌙';}
-    icon();
-    btn.addEventListener('click',function(){
-      var next = cur()==='dark' ? 'light' : 'dark';
+    function render(){
+      var d=cur()==='dark';
+      var L=btn.querySelector('[data-mode=\\"L\\"]'), D=btn.querySelector('[data-mode=\\"D\\"]');
+      if(L)L.classList.toggle('is-active',!d);
+      if(D)D.classList.toggle('is-active',d);
+    }
+    render();
+    btn.addEventListener('click',function(e){
+      var opt=e.target.closest('[data-mode]');
+      var next = opt ? (opt.getAttribute('data-mode')==='D'?'dark':'light')
+                     : (cur()==='dark'?'light':'dark');
       document.documentElement.setAttribute('data-theme',next);
       try{localStorage.setItem('theme',next);}catch(e){}
-      icon();
+      render();
     });
   })();
   </script>"""
@@ -87,7 +94,7 @@ def page(title, body):
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>
 {THEME_HEAD_JS}
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
 {header_html()}
@@ -137,15 +144,13 @@ def date_ja(iso):
 # ---- 記事ページ生成 ---------------------------------------------------------
 
 def render_article(p):
-    thumb = ""
-    if p["thumbnail"]:
-        thumb = (f'    <div class="article__hero">'
-                 f'<img src="{html.escape(p["thumbnail"])}" alt="" /></div>\n')
+    # 記事上部のヒーロー画像は本文先頭画像（＝サムネイル）と重複するため出力しない。
+    # thumbnail は一覧カードのサムネイルとしてのみ使用する。
     body = f"""  <article class="article">
     <a href="index.html" class="article__back">← ブログ一覧へ戻る</a>
     <h1 class="article__title">{html.escape(p["title"])}</h1>
     <div class="article__meta">{html.escape(p["category"])} ・ {date_ja(p["date"])}</div>
-{thumb}    <div class="article__body">
+    <div class="article__body">
 {p["body_html"]}
     </div>
   </article>"""
