@@ -19,9 +19,7 @@ POSTS_DIR = ROOT / "posts"
 
 # 一覧上部のカテゴリナビ（表示順）
 CATEGORIES = [
-    "All", "Research", "Case Study", "Methodology",
-    "Organization & Culture", "Finance", "Event & Media",
-    "Inside PMI ThinkTank",
+    "All", "調査レポート", "政策提言", "解説", "お知らせ",
 ]
 
 # ---- 共通パーツ -------------------------------------------------------------
@@ -31,7 +29,6 @@ def header_html():
     <div class="site-header__inner">
       <a href="index.html" class="logo">
         pmi<span class="dot">.</span>thinktank
-        <span class="logo__sub">Post-Merger Integration Research</span>
       </a>
     </div>
   </header>"""
@@ -86,7 +83,11 @@ def parse_post(path):
         if not line.strip() or ":" not in line:
             continue
         key, val = line.split(":", 1)
-        meta[key.strip()] = val.strip()
+        val = val.strip()
+        # 前後の対になるクオートを除去
+        if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
+            val = val[1:-1]
+        meta[key.strip()] = val
 
     for req in ("title", "date", "category"):
         if req not in meta:
