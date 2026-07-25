@@ -68,6 +68,9 @@ img { max-width: 100%; height: auto; }
   font-size: 18px;
   color: rgba(255, 255, 255, 0.88);
   max-width: 40em;
+  line-break: strict;
+  word-break: auto-phrase;
+  text-wrap: pretty;
 }
 .hero__cta {
   display: inline-flex;
@@ -98,7 +101,13 @@ img { max-width: 100%; height: auto; }
 .section__title { font-size: 32px; font-weight: 700; margin-top: 8px; letter-spacing: -0.01em; }
 
 /* ===== About ===== */
-.about__lead { font-size: 19px; max-width: 44em; }
+.about__lead {
+  font-size: 19px;
+  max-width: 44em;
+  line-break: strict;
+  word-break: auto-phrase;
+  text-wrap: pretty;
+}
 .about__grid {
   margin-top: 44px;
   display: grid;
@@ -115,6 +124,10 @@ img { max-width: 100%; height: auto; }
   color: #333;
   margin-bottom: 20px;
   max-width: 46em;
+  /* 日本語を文節単位で自然に折り返す（未対応ブラウザは通常折り返しにフォールバック） */
+  line-break: strict;
+  word-break: auto-phrase;
+  text-wrap: pretty;
 }
 .message__sign {
   margin-top: 56px;
