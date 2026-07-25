@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>【PublicNotes特集】COCOAはなぜ機能しないのか（前編）～パーソルとの契約を「変更」した経緯～ | PMI ThinkTank Blog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="../" class="site-home">← PMI ThinkTank</a>
+      <a href="index.html" class="logo">
+        PMI ThinkTank Blog
+      </a>
+    </div>
+  </header>
+  <article class="article">
+    <a href="index.html" class="article__back">← ブログ一覧へ戻る</a>
+    <h1 class="article__title">【PublicNotes特集】COCOAはなぜ機能しないのか（前編）～パーソルとの契約を「変更」した経緯～</h1>
+    <div class="article__meta">論考 ・ 2021年2月26日</div>
+    <div class="article__hero"><img src="images/na095f47ec2f2_e19c8c45b58612457bf9a2ecc9337e57.png" alt="" /></div>
+    <div class="article__body">
+<p><img alt="" src="images/na095f47ec2f2_e19c8c45b58612457bf9a2ecc9337e57.png" /></p>
+<blockquote>
+<p>【Public Notes】とはミレニアル世代のシンクタンクPublicMeetsInnovationがイノベーターに知ってもらいたいイノベーションとルールメイキングに纏わる情報をお届けする記事です。</p>
+<p>PublicMeetsInnovationでは、2020年7月13日オンラインイベント「NEW PUBLIC 〜ルールはつくれる、変えられる。イノベーションを社会実装するために 」を開催し、コロナの感染を抑える一つの手段として、COCOAをはじめとするテクノロジーの利活用の可能性を議論しました。</p>
+<p>それから半年が経ち、感染抑制におけるCOCOAの効果について様々な議論がされている中、本稿では、改めてその政策決定プロセスと効果を検証するとともに、感染拡大抑制のためのテクノロジーの可能性と課題を考え今後のアップデートの方向性について考えていきたいと思います。</p>
+</blockquote>
+<p>新型コロナウイルス接触確認アプリ（COCOA) が誕生してまもなく10か月を迎えようとしています。<br />
+当初は順調に増加していた登録者数ですが、年末あたりから鈍化傾向を迎え、最近では、濃厚接触があるにも関わらず通知されないという不具合が紙面を騒がすようになっていました。</p>
+<p><a href="https://www.47news.jp/5801807.html">https://www.47news.jp/5801807.html</a></p>
+<p>一方、COCOAの不具合を伝える報道を見ても、多くはなぜそれが発生したのか分析しておらず、分析していたとしても<strong>「業者がサボっていた」「厚労省が忙しく回っていなかった」</strong>と体制面での不備を挙げる場合が多いように感じました。<br />
+もちろん、それも要因の一つだとは思いますが、本当にそれだけなのでしょうか。そこにはより本質的な「<strong>国がテクノロジーを活用すること</strong>」へのヒントが隠されているのではないでしょうか。</p>
+<p>こうした疑問に答えるため、今回PMIは、医療、政策、テクノロジーそれぞれの分野に専門性を持つスタッフを集め、専門家等へのヒアリングを行い、独自にCOCOAの背後にある要因を探ろうと試みました。調査の結果浮かび上がってきたのは、<strong>テクノロジーの利点を行政が活かしきることができていなかったという構造上の欠点</strong>でした。長文になりますので、前編・中編・後編の三本立てでお送りします。</p>
+<p>9月のデジタル庁発足に向けても、政府がテクノロジーをどう活用していくことができるかは、わが国の優先分野の一つです。この記事がよりよい行政運営に向けて、何か気づきを与えるものになれば幸いです。</p>
+<h2>COCOAの基礎知識</h2>
+<p>まずはごくごく簡単に、COCOAの基本情報に触れておきましょう。<br />
+COCOAは、新型コロナウイルスの拡大防止のため、昨年6月にリリースされたスマートフォン用アプリケーションです。</p>
+<p>Bluetoothを活用することで他人との距離を測定し、陽性者と接触した可能性について通知を受けることができます。中国や韓国など一部の国で利用されているGPS方式を用いていないため、国などの機関が感染者を追跡することはできず、あくまで陽性者との接触が分かるという点で、プライバシーに配慮した仕組みだと言われています。</p>
+<p>リリース当初は積極的な広報もあり順調に利用者を伸ばしていたCOCOAでしたが、年末近くからその勢いは鈍化し、かろうじて増加傾向にあるのが現状です（画像は<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/cocoa_00138.html">こ厚生労働省HP</a>より引用）。</p>
+<h2>ユニークな開発経緯</h2>
+<p>COCOAが最初に注目を浴びたのは、そのユニークな開発経緯でした。少し長くなりますが、大事な点なので丁寧にご説明したいと思います。</p>
+<p>COCOAは最初、エンジニアたちが有志で立ち上げた<strong>オープンソースソフトウェア（OSS)「</strong><a href="https://github.com/kvaluation/Covid19Radar"><strong>Covid19Radar</strong></a><strong>」</strong>から始まっています。<br />
+オープンソースソフトウェアとは、通常は企業秘密として隠されているアプリのコードを公開することで、誰でも自由にアクセスできるようにしたもの（wikipediaをイメージしてもらうと分かりやすいかもしれません）。さまざまなエンジニアがコードを閲覧し変更することができるので、より多くの知恵を集めることができるというメリットがあります（画像は<a href="https://thinkit.co.jp/cert/books/1/1/2/3.htm">Thinkit</a>から引用）。</p>
+<p>さて、有志が自主的に作り始めていたCovid19Raderでしたが、日本政府は日本政府で、ITを活用した感染拡大防止について議論を続けていました。<br />
+4月6日には<a href="https://cio.go.jp/techteam_kickoff">第一回新型コロナウイルス感染症対策テックチームキックオフ会議</a>が開催され、議題の一つとして「<strong>シンガポールのTrace Togetherアプリケーション日本版の実装検討</strong>」が挙げられています。この時点では政府も、アプリの開発が実現可能か、実現するとすればどのような形態になるのか、まだ手探り状態だったと思われます。</p>
+<p>一方、実はこの時点で、Covid19Raderとは別に、もう一つ有志で開発を進めていた「<a href="https://github.com/mamori-i-japan">まもりあいJapan</a>」というアプリがありました。実際にはそれ以外にもいくつかあり、ベースとなるアプリが複数日本に存在するなかで議論が始まりました。ところが、ここで話をややこしくする事態が発生します。<br />
+それは、5月上旬、AndroidとiOSという二大スマホ用OSを開発する<strong>GoogleとAppleが、接触確認アプリについて方針を打ち出した</strong>ということでした。<br />
+そこでは、<br />
+・<strong>個人情報に配慮して、GPSではなくBluetoothを活用すること</strong><br />
+・<strong>アプリは各国に1アプリのみとすること</strong><br />
+の大きく2点が求められていました。</p>
+<p>ここで日本政府は二つの決断を迫られることになります。一つは、<strong>Bluetoothを使ったアプリに踏み切るということ</strong>、もう一つは、<strong>いずれのオープンソースソフトウェア（OSS）をベースにするかということ</strong>でした。</p>
+<p>Bluetoothの活用についての決断は早く、5月9日に開催された<a href="https://cio.go.jp/node/2605">第一回接触確認アプリに関する有識者検討会合</a>では、「技術的な安定性、アプリケーションの消費電力の節約等、ユーザーの利便性の観点から <strong>Apple、Google の提供する API を活用する前提で</strong>接触確認アプリの仕様を検討」するとされており、基本的にGoogle、AppleのAPIを活用することが決まっています。</p>
+<blockquote>
+<p>「API（Application Programming Interface）」とは、アプリケーション同士を繋げるための「つなぎ」のようなものです。Apple、Googleという二大スマホ基盤がコロナ追跡アプリ用にAPIを用意するということは、そのAPIを使うことによって、それぞれの機種で最も効率よく濃厚接触の検出・追跡ができるアプリを開発できるということを意味しています。</p>
+</blockquote>
+<p>また、その一週間後の5月17日に行われた<a href="https://cio.go.jp/node/2612">第二回接触確認アプリに関する有識者検討会合</a>では、より細かな仕様書等に関する議論が行われています。</p>
+<blockquote>
+<p>ちなみに、少し古いですが昨年5月の記事によると、ほとんどの国はGoogle、Appleの条件通りBluetoothを活用することを前提にアプリを開発していたようであり、日本だけが特殊なわけではなかったと思われます。また、Google、Appleのシステムを採用しなかったシンガポールは、その後アプリを通じて収集されたデータが犯罪捜査に利用されるようになるなど、プライバシーにかかわる重大な懸念も指摘されています。Bluetoothはオンオフによって効果が出なくなってしまうという点が短所としてよく挙げられますが、こうした経緯を踏まえると、当時の判断はある程度合理的だったと言えるのではないでしょうか。</p>
+</blockquote>
+<p><a href="https://www.technologyreview.jp/s/230403/singapores-police-now-have-access-to-contact-tracing-data/">https://www.technologyreview.jp/s/230403/singapores-police-now-have-access-to-contact-tracing-data/</a></p>
+<p>話を戻しましょう。<br />
+一方、ベースアプリはCovid19Raderが選ばれることになったわけですが、実はこの経緯はイマイチよく分かりません。少し時間が前後しますが、5月8日に開催された<a href="https://cio.go.jp/node/2604">第三回新型コロナウイルス感染症対策テックチームキックオフ会議</a>では、まもりあいJapanを開発するCode for Japanの関代表が登壇され、<a href="https://cio.go.jp/sites/default/files/uploads/documents/techteam_20200508_03.pdf">まもりあいJapan</a>のプレゼンを行っています。</p>
+<p>その後、有識者会議にOSSの関係者が出てきた形跡はないですが、<a href="http://Retrenchment%20proponents%20argue%20that%20the%20current%20U.S.%20grand%20strategy%20of%20%22deep%20engagement%22%20has%20high%20and%20rising%20costs%20that%20dwarf%20its%20benefits.2%20The%20United%20States&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;#39;%20decline%20relative%20to%20potential%20rivals%20makes%20it%20ever%20harder%20to%20maintain%20its%20multitudinous%20commitments,%20while%20its%20allies%20can%20afford%20to%20defend%20themselves%20and%20should%20no%20longer%20be%20%22subsidized.%22%20America&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;#39;s%20intrusive%20grand">むぐら</a>さんが行った情報開示請求の中に、最終的に<strong>厚生労働省がCOCOA開発の委託契約を結ぶことになるパーソルプロセス＆テクノロジー</strong>との間の「<a href="https://drive.google.com/file/d/1Er4uivDSUF6Z5kvV8bw3Llt0OL3kQORd/view"><strong>再委託変更申請書</strong></a>」（5月27日）があります。<br />
+これによると、Covid19Raderに有志が多くかかわっていた日本マイクロソフトが再委託先として名を連ねており、この時点でCovid19Raderがベースになることが公式に決定していたことが推測できます（一方、Covid19Raderの開発者はパーソルからの委託業務には携わっていないようです）。<br />
+どのような経緯でCovid19Raderが選ばれたかは以前から議論があるところですが、仕様書上どちらをベースにするかは特に明記されていないことを踏まえると、<strong>最終的なアプリ開発責任者である委託先（パーソル）との協議のうえ決定したと考えるのが妥当ではないか</strong>と思います。</p>
+<h2>複雑すぎる委託関係</h2>
+<p>さて、ここで勘の鋭い方はお気づきになられたかもしれません。<br />
+うえでパーソルプロセス＆テクノロジーとの間の「再委託変更申請書」と申し上げましたが、<strong>なぜ変更なのでしょうか</strong>。<strong>変更ということは、何かその前に別の契約があったのでしょうか</strong>。</p>
+<p>実はその通り、COCOAの委託先として名を知られるようになったパーソルは、以前にとある契約を厚生労働省と結んでいました。それが<strong>新型コロナウイルス感染者等情報把握・管理支援システム（HERSYS）</strong>です。<br />
+HERSYSとは、保健所、自治体（保健所以外の部門）、医療機関、関係業務の受託者等の関係者の間での情報共有が即時に行えるように開発されたシステムで、迅速な情報共有と負担軽減のために作られました（画像は<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000121431_00129.html">厚生労働省HP</a>から引用）。</p>
+<p>この開発を4月時点で受託していたのがパーソルなのです。<br />
+したがって、ここでいう変更とは、「<strong>もともとHERSYSを開発してもらうための契約</strong>」を「<strong>COCOAも一緒に作ってもらう契約</strong>」に変更したことを意味しており、結果以下３つの契約が登場します。<br />
+①<strong>HERSYSを開発してもらうための契約</strong>（4月）<br />
+②<strong>追加でCOCOAも作ってもらうための</strong><a href="https://drive.google.com/file/d/1h-wgpOgkPWfiz5bItmMI5I9sZJbCf13E/view"><strong>変更契約</strong></a>（5月27日）<br />
+③<strong>COCOAを作るために再委託することを委託元に許してもらうための再委託変更申請書</strong>（5月27日、上で出てきたものと同じ）</p>
+<blockquote>
+<p>ちなみに、昨年6月26日の国会質疑における丸山穂高議員の質問主意書に対して政府は、（接触確認アプリの金額について）「令和二年七月までの間における開発、運用、保守等に係る経費は、九千四百六十万円」と答えていますが、これはまさに変更契約によって増額された金額と一致していました。ざっくりいうと以下の通りです。①HERSYSを開発してもらうための契約　　　　　1億9988万円②追加でCOCOAも作ってもらうための変更契約　 2億9448万円差額　　　　　　　　　　　　　　　　　　　   　 　9460万円</p>
+</blockquote>
+<p>①、②は契約本体、<strong>③は②に付随して提出された再委託先を追加するための申請書</strong>というイメージです。パーソルだけでCOCOAを開発することはできないと言うことで、③の申請を行った結果、新たにFIXER株式会社、日本マイクロソフトなどがパーソルから再委託先として指名されることになりました（以下は再委託変更申請書から抜粋、乙とはパーソルのことを指します）。</p>
+<p>ようやく全体が見えてきましたが、ここで一つ疑問が沸いてきます。なぜ、<strong>厚労省はHERSYS発注先のパーソルにCOCOAもお願いしたかったのでしょうか</strong>。</p>
+<p>ここには二つ理由があるのではないかと考えています。<br />
+第一は、<strong>COCOAとHERSYSを連動させることを政府が考えていた</strong>という事情です。こちらは上にも登場した5月8日開催の<a href="https://cio.go.jp/node/2604">第三回新型コロナウイルス感染症対策テックチームキックオフ会議</a>における資料ですが、COCOAとHERSYSの連動を明確に検討していることがうかがえます。<br />
+両者を連動させる以上、同じ委託先の方が効率的に開発することができると考えても不思議ではありません。</p>
+<blockquote>
+<p>ちなみに、上記の通りもともとはHERSYSの連携を前提に考えられていたCOCOAですが、5月17日の第２回接触確認アプリに関する有識者検討会合では、有識者から「陽性者やその接触者との関係が特定されるおそれもあるため、慎重に検討すべき。」と指摘を受けるなど、慎重論も出てきたため、個人情報等の観点を踏まえて最終的に切り離されて運用されることになったようです。</p>
+</blockquote>
+<p>第二の理由は、政府CIO補佐官の楠正憲さんがTwitterで指摘している通り、COCOAを担当していた<strong>厚労省結核感染症課が多忙で新規調達を立てられず、HERSYSの契約変更になったということ</strong>です。</p>
+<p><a href="https://twitter.com/masanork/status/1358252376407220225?s=20">https://twitter.com/masanork/status/1358252376407220225?s=20</a></p>
+<p>行政で調達を経験したことのある方ならお分かりになるかもしれませんが、<strong>新規調達というのはかなり時間と手間がかかる</strong>ものです。<br />
+一般的に調達は、<strong>仕様書の作成→公示→入札→契約</strong>というフローをたどりますが、公示後一定期間開けないといけなかったり、入札に際しては（当然ながら）評価基準を決めないといけなかったり、とにかく大変です（画像は<a href="https://www.jica.go.jp/announce/manual/form/domestic/op_tend_price.html">JICAHP</a>から引用）。</p>
+<p>そこで厚労省としては、そもそもCOCOAを一刻も早く開発しなければならないという事情があったこともあり、<strong>新規調達ではなく契約変更という形にした</strong>ものと思われます。</p>
+<p>時系列がいったりきたりしてしまったので、最後に5月の一連の動きを整理しておきます。</p>
+<p>前編はここまでです。<br />
+次回中編では、こうした<strong>突貫で進めた開発体制にひそんでいた落とし穴</strong>について、３つの視点から考えていきたいと思います。</p>
+<p><a href="https://note.com/pmi/n/na688f64d9aaa">https://note.com/pmi/n/na688f64d9aaa</a></p>
+    </div>
+  </article>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span>© 2026 PMI ThinkTank</span>
+      <div class="social">
+        <a href="#">LinkedIn</a>
+        <a href="#">X (Twitter)</a>
+        <a href="#">note</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
