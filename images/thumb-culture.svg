@@ -1,0 +1,7 @@
+<svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="420" fill="#1a1a1a"/>
+  <circle cx="380" cy="210" r="150" fill="none" stroke="#e8794b" stroke-width="4"/>
+  <circle cx="620" cy="210" r="150" fill="none" stroke="#8fd3e8" stroke-width="4"/>
+  <text x="500" y="220" fill="#ffffff" font-family="Helvetica, sans-serif" font-size="26" font-weight="700" text-anchor="middle">Culture</text>
+  <text x="500" y="252" fill="#ffffff" font-family="Helvetica, sans-serif" font-size="26" font-weight="700" text-anchor="middle">Fit</text>
+</svg>
