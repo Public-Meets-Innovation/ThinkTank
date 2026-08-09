@@ -217,13 +217,60 @@ FILTER_JS = """  <script>
   })();
   </script>"""
 
-# ---- トップページ（ルート index.html）の最新記事を差し込む ------------------
+# ---- トップレベルの各ページ（トップ/私たちについて/プロジェクト/お問い合わせ）----
 
-def render_top(posts, n=3):
-    template = SITE_ROOT / "index.template.html"
-    if not template.exists():
-        print("  (トップページのテンプレートが無いためスキップ)")
-        return
+# ヘッダーナビ（全トップレベルページ共通）
+SITE_NAV = [
+    ("about.html", "私たちについて"),
+    ("projects.html", "プロジェクト"),
+    ("blog/", "ブログ"),
+    ("contact.html", "お問い合わせ"),
+]
+
+def site_nav(active):
+    links = []
+    for href, label in SITE_NAV:
+        cls = ' class="is-active"' if href == active else ''
+        links.append(f'        <a href="{href}"{cls}>{html.escape(label)}</a>')
+    return ('  <nav class="nav">\n'
+            '    <div class="nav__inner">\n'
+            '      <a href="index.html" class="nav__logo">PMI ThinkTank</a>\n'
+            '      <div class="nav__links">\n' + "\n".join(links) + "\n"
+            '      </div>\n'
+            '    </div>\n'
+            '  </nav>')
+
+def site_footer():
+    return ('  <footer class="site-foot">\n'
+            '    <div class="wrap site-foot__inner">\n'
+            '      <span>© 2026 PMI ThinkTank (Public Meets Innovation)</span>\n'
+            '      <div class="site-foot__social">\n'
+            '        <a href="https://x.com/PMI__official" target="_blank" rel="noopener">Twitter</a>\n'
+            '        <a href="https://note.com/pmi_thinktank" target="_blank" rel="noopener">note</a>\n'
+            '      </div>\n'
+            '    </div>\n'
+            '  </footer>')
+
+def site_shell(title, active, body_html, description=""):
+    desc = (f'\n  <meta name="description" content="{html.escape(description)}" />'
+            if description else "")
+    return f"""<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{html.escape(title)}</title>{desc}
+  <link rel="stylesheet" href="home.css?v=4" />
+</head>
+<body>
+{site_nav(active)}
+{body_html}
+{site_footer()}
+</body>
+</html>
+"""
+
+def home_cards(posts, n=3):
     cards = []
     for p in posts[:n]:
         link = f'blog/{p["slug"]}.html'
@@ -238,10 +285,28 @@ def render_top(posts, n=3):
           <a href="{link}"><h3 class="home-card__title">{html.escape(p["title"])}</h3></a>
         </div>
       </article>""")
-    html_out = template.read_text(encoding="utf-8").replace(
-        "<!--LATEST_POSTS-->", "\n".join(cards))
-    (SITE_ROOT / "index.html").write_text(html_out, encoding="utf-8")
-    print(f"  トップpage生成: index.html（最新{min(n, len(posts))}件を掲載）")
+    return "\n".join(cards)
+
+def render_toplevel(posts, n=3):
+    partials = SITE_ROOT / "partials"
+    pages = [
+        ("index.html", "index.html", "PMI ThinkTank",
+         "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"),
+        ("about.body.html", "about.html", "私たちについて | PMI ThinkTank", ""),
+        ("projects.body.html", "projects.html", "プロジェクト | PMI ThinkTank", ""),
+        ("contact.body.html", "contact.html", "お問い合わせ | PMI ThinkTank", ""),
+    ]
+    # index のパーシャル名だけ別（body ファイル名）
+    index_body = "index.body.html"
+    for partial, out, title, desc in pages:
+        src = partials / (index_body if out == "index.html" else partial)
+        body = src.read_text(encoding="utf-8")
+        if out == "index.html":
+            body = body.replace("<!--LATEST_POSTS-->", home_cards(posts, n))
+        active = "index.html" if out == "index.html" else out
+        (SITE_ROOT / out).write_text(
+            site_shell(title, active, body, desc), encoding="utf-8")
+    print(f"  トップレベル生成: index / about / projects / contact（最新{min(n, len(posts))}件掲載）")
 
 # ---- main -------------------------------------------------------------------
 
@@ -257,8 +322,8 @@ def main():
         name = render_article(p)
         print(f"  記事生成: {name}")
     render_index(posts)
-    render_top(posts)
-    print(f"\n✅ 完了: {len(posts)}件の記事 + 一覧 + トップページを生成しました。")
+    render_toplevel(posts)
+    print(f"\n✅ 完了: {len(posts)}件の記事 + ブログ一覧 + トップレベル4ページを生成しました。")
 
 if __name__ == "__main__":
     main()
