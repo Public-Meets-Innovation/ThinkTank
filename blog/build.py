@@ -29,13 +29,14 @@ CATEGORIES = [
 
 # ---- 共通パーツ -------------------------------------------------------------
 
-def social_meta_head(prefix, title, canonical_path, description=""):
+def social_meta_head(prefix, title, canonical_path, description="", image_path="logo.png"):
     """favicon と OGP / Twitter Card のメタタグ。
-    prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon・OGP画像はここから解決。
+    prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon はここから解決。
     canonical_path: サイトルートからの絶対パス（例 "" / "about/" / "blog/xxx.html"）。og:url に使用。
+    image_path: サイトルートからの相対パス（例 "logo.png" / "blog/images/xxx.jpg"）。og:image に使用。
     """
     desc = description or DEFAULT_DESCRIPTION
-    image_url = SITE_BASE_URL + "logo.png"
+    image_url = SITE_BASE_URL + image_path
     page_url = SITE_BASE_URL + canonical_path
     return f"""  <link rel="icon" type="image/png" href="{prefix}favicon.png" />
   <meta property="og:type" content="website" />
@@ -110,9 +111,9 @@ def nav_html():
             f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
-def page(title, body, canonical_path="blog/", description=""):
+def page(title, body, canonical_path="blog/", description="", image_path="logo.png"):
     # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
-    social = social_meta_head("../", title, canonical_path, description)
+    social = social_meta_head("../", title, canonical_path, description, image_path)
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -181,10 +182,13 @@ def render_article(p):
 {p["body_html"]}
     </div>
   </article>"""
+    # OGP画像は記事のサムネイルを優先。無ければ共通ロゴにフォールバック。
+    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "logo.png"
     out = ROOT / f'{p["slug"]}.html'
     out.write_text(
         page(f'{p["title"]} | PMI ThinkTank Blog', body,
-             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"]),
+             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"],
+             image_path=image_path),
         encoding="utf-8")
     return out.name
 
