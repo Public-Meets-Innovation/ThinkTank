@@ -31,7 +31,8 @@ def _asset_ver(path):
 HOME_CSS_VER = _asset_ver(SITE_ROOT / "home.css")
 BLOG_CSS_VER = _asset_ver(ROOT / "style.css")
 
-# 本番公開URL（OGPの絶対URL生成に使用）。logo.png / favicon.png はリポジトリルート直下。
+# 本番公開URL（OGPの絶対URL生成に使用）。ogp.png / logo.png / favicon.png はリポジトリルート直下。
+# ogp.png = SNSシェア用（1200x630）、logo.png = ヘッダー表示用、favicon.png = タブアイコン。
 SITE_BASE_URL = "https://thinktank.pmi.or.jp/"
 DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
 
@@ -47,11 +48,11 @@ CATEGORIES = [
 
 # ---- 共通パーツ -------------------------------------------------------------
 
-def social_meta_head(prefix, title, canonical_path, description="", image_path="logo.png"):
+def social_meta_head(prefix, title, canonical_path, description="", image_path="ogp.png"):
     """favicon と OGP / Twitter Card のメタタグ。
     prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon はここから解決。
     canonical_path: サイトルートからの絶対パス（例 "" / "about/" / "blog/xxx.html"）。og:url に使用。
-    image_path: サイトルートからの相対パス（例 "logo.png" / "blog/images/xxx.jpg"）。og:image に使用。
+    image_path: サイトルートからの相対パス（例 "ogp.png" / "blog/images/xxx.jpg"）。og:image に使用。
     """
     desc = description or DEFAULT_DESCRIPTION
     image_url = SITE_BASE_URL + image_path
@@ -129,7 +130,7 @@ def nav_html():
             f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
-def page(title, body, canonical_path="blog/", description="", image_path="logo.png"):
+def page(title, body, canonical_path="blog/", description="", image_path="ogp.png"):
     # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
     social = social_meta_head("../", title, canonical_path, description, image_path)
     return f"""<!DOCTYPE html>
@@ -202,7 +203,7 @@ def render_article(p):
     </div>
   </article>"""
     # OGP画像は記事のサムネイルを優先。無ければ共通ロゴにフォールバック。
-    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "logo.png"
+    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "ogp.png"
     out = ROOT / f'{p["slug"]}.html'
     out.write_text(
         page(f'{p["title"]} | PMI ThinkTank Blog', body,
