@@ -48,6 +48,36 @@ CATEGORIES = [
 
 # ---- 共通パーツ -------------------------------------------------------------
 
+def image_size(path):
+    """PNG / JPEG の寸法を外部ライブラリなしで読む。取得できなければ None。
+    og:image:width / height を宣言しておくと、SNS側が画像を落とす前にカードを
+    描画できるため、初回シェア時に画像が出ないケースを減らせる。"""
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return None
+    # PNG: 8バイトのシグネチャ + IHDR（長さ4 + "IHDR"4 + 幅4 + 高さ4）
+    if data[:8] == b"\x89PNG\r\n\x1a\n" and data[12:16] == b"IHDR":
+        return (int.from_bytes(data[16:20], "big"),
+                int.from_bytes(data[20:24], "big"))
+    # JPEG: SOFn マーカーを走査して寸法を取る
+    if data[:2] == b"\xff\xd8":
+        i = 2
+        while i + 9 < len(data):
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker = data[i + 1]
+            # SOF0-SOF15（DHT/JPG/DAC のような非SOFは除外）
+            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                return (int.from_bytes(data[i + 7:i + 9], "big"),
+                        int.from_bytes(data[i + 5:i + 7], "big"))
+            seg_len = int.from_bytes(data[i + 2:i + 4], "big")
+            if seg_len <= 0:
+                break
+            i += 2 + seg_len
+    return None
+
 def social_meta_head(prefix, title, canonical_path, description="", image_path="ogp.png"):
     """favicon と OGP / Twitter Card のメタタグ。
     prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon はここから解決。
@@ -57,17 +87,27 @@ def social_meta_head(prefix, title, canonical_path, description="", image_path="
     desc = description or DEFAULT_DESCRIPTION
     image_url = SITE_BASE_URL + image_path
     page_url = SITE_BASE_URL + canonical_path
+    size = image_size(SITE_ROOT / image_path)
+    dims = ""
+    if size:
+        dims = (f'\n  <meta property="og:image:width" content="{size[0]}" />'
+                f'\n  <meta property="og:image:height" content="{size[1]}" />')
     return f"""  <link rel="icon" type="image/png" href="{prefix}favicon.png" />
+  <link rel="canonical" href="{page_url}" />
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ja_JP" />
   <meta property="og:site_name" content="PMI ThinkTank" />
   <meta property="og:title" content="{html.escape(title)}" />
   <meta property="og:description" content="{html.escape(desc)}" />
   <meta property="og:url" content="{page_url}" />
   <meta property="og:image" content="{image_url}" />
+  <meta property="og:image:secure_url" content="{image_url}" />{dims}
+  <meta property="og:image:alt" content="{html.escape(title)}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{html.escape(title)}" />
   <meta name="twitter:description" content="{html.escape(desc)}" />
-  <meta name="twitter:image" content="{image_url}" />"""
+  <meta name="twitter:image" content="{image_url}" />
+  <meta name="twitter:image:alt" content="{html.escape(title)}" />"""
 
 def header_html():
     return """  <header class="site-header">
