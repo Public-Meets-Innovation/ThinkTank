@@ -18,12 +18,36 @@ ROOT = Path(__file__).parent          # blog/ ディレクトリ
 POSTS_DIR = ROOT / "posts"
 SITE_ROOT = ROOT.parent               # リポジトリのルート（トップページを置く場所）
 
+# 本番公開URL（OGPの絶対URL生成に使用）。logo.png / favicon.png はリポジトリルート直下。
+SITE_BASE_URL = "https://public-meets-innovation.github.io/ThinkTank/"
+DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
+
 # 一覧上部のカテゴリナビ（表示順）
 CATEGORIES = [
     "All", "調査レポート", "論考", "解説", "プレスリリース",
 ]
 
 # ---- 共通パーツ -------------------------------------------------------------
+
+def social_meta_head(prefix, title, canonical_path, description=""):
+    """favicon と OGP / Twitter Card のメタタグ。
+    prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon・OGP画像はここから解決。
+    canonical_path: サイトルートからの絶対パス（例 "" / "about/" / "blog/xxx.html"）。og:url に使用。
+    """
+    desc = description or DEFAULT_DESCRIPTION
+    image_url = SITE_BASE_URL + "logo.png"
+    page_url = SITE_BASE_URL + canonical_path
+    return f"""  <link rel="icon" type="image/png" href="{prefix}favicon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PMI ThinkTank" />
+  <meta property="og:title" content="{html.escape(title)}" />
+  <meta property="og:description" content="{html.escape(desc)}" />
+  <meta property="og:url" content="{page_url}" />
+  <meta property="og:image" content="{image_url}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{html.escape(title)}" />
+  <meta name="twitter:description" content="{html.escape(desc)}" />
+  <meta name="twitter:image" content="{image_url}" />"""
 
 def header_html():
     return """  <header class="site-header">
@@ -86,13 +110,16 @@ def nav_html():
             f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
-def page(title, body):
+def page(title, body, canonical_path="blog/", description=""):
+    # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
+    social = social_meta_head("../", title, canonical_path, description)
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>
+{social}
 {THEME_HEAD_JS}
   <link rel="stylesheet" href="style.css?v=3" />
 </head>
@@ -155,7 +182,10 @@ def render_article(p):
     </div>
   </article>"""
     out = ROOT / f'{p["slug"]}.html'
-    out.write_text(page(f'{p["title"]} | PMI ThinkTank Blog', body), encoding="utf-8")
+    out.write_text(
+        page(f'{p["title"]} | PMI ThinkTank Blog', body,
+             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"]),
+        encoding="utf-8")
     return out.name
 
 # ---- 一覧ページ生成 ---------------------------------------------------------
@@ -184,7 +214,7 @@ def render_index(posts):
     body = nav_html() + '\n\n  <main class="post-list">\n' + \
         "\n\n".join(cards) + "\n" + empty + "\n  </main>\n" + FILTER_JS
     (ROOT / "index.html").write_text(
-        page("PMI ThinkTank Blog", body), encoding="utf-8")
+        page("PMI ThinkTank Blog", body, canonical_path="blog/"), encoding="utf-8")
 
 # 一覧のカテゴリ絞り込み（クリックで表示/非表示を切り替え）
 FILTER_JS = """  <script>
@@ -219,22 +249,24 @@ FILTER_JS = """  <script>
 
 # ---- トップレベルの各ページ（トップ/私たちについて/プロジェクト/お問い合わせ）----
 
-# ヘッダーナビ（全トップレベルページ共通）
+# ヘッダーナビ（全トップレベルページ共通）。key は clean URL のディレクトリ名。
 SITE_NAV = [
-    ("about.html", "私たちについて"),
-    ("projects.html", "プロジェクト"),
-    ("blog/", "ブログ"),
-    ("contact.html", "お問い合わせ"),
+    ("about", "私たちについて"),
+    ("projects", "プロジェクト"),
+    ("blog", "ブログ"),
+    ("contact", "お問い合わせ"),
 ]
 
-def site_nav(active):
+def site_nav(active, prefix):
+    """prefix はサイトルートまでの相対パス（ルート="" / サブページ="../"）。"""
     links = []
-    for href, label in SITE_NAV:
-        cls = ' class="is-active"' if href == active else ''
-        links.append(f'        <a href="{href}"{cls}>{html.escape(label)}</a>')
+    for key, label in SITE_NAV:
+        cls = ' class="is-active"' if key == active else ''
+        links.append(f'        <a href="{prefix}{key}/"{cls}>{html.escape(label)}</a>')
+    home = prefix if prefix else './'
     return ('  <nav class="nav">\n'
             '    <div class="nav__inner">\n'
-            '      <a href="index.html" class="nav__logo">PMI ThinkTank</a>\n'
+            f'      <a href="{home}" class="nav__logo">PMI ThinkTank</a>\n'
             '      <div class="nav__links">\n' + "\n".join(links) + "\n"
             '      </div>\n'
             '    </div>\n'
@@ -251,19 +283,21 @@ def site_footer():
             '    </div>\n'
             '  </footer>')
 
-def site_shell(title, active, body_html, description=""):
+def site_shell(title, active, body_html, prefix, canonical_path, description=""):
     desc = (f'\n  <meta name="description" content="{html.escape(description)}" />'
             if description else "")
+    social = social_meta_head(prefix, title, canonical_path, description)
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>{desc}
-  <link rel="stylesheet" href="home.css?v=4" />
+{social}
+  <link rel="stylesheet" href="{prefix}home.css?v=6" />
 </head>
 <body>
-{site_nav(active)}
+{site_nav(active, prefix)}
 {body_html}
 {site_footer()}
 </body>
@@ -289,24 +323,26 @@ def home_cards(posts, n=3):
 
 def render_toplevel(posts, n=3):
     partials = SITE_ROOT / "partials"
+    # (partial, out_path, active_key, prefix, canonical_path, title, description)
     pages = [
-        ("index.html", "index.html", "PMI ThinkTank",
-         "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"),
-        ("about.body.html", "about.html", "私たちについて | PMI ThinkTank", ""),
-        ("projects.body.html", "projects.html", "プロジェクト | PMI ThinkTank", ""),
-        ("contact.body.html", "contact.html", "お問い合わせ | PMI ThinkTank", ""),
+        ("index.body.html", "index.html", "index", "", "",
+         "PMI ThinkTank", DEFAULT_DESCRIPTION),
+        ("about.body.html", "about/index.html", "about", "../", "about/",
+         "私たちについて | PMI ThinkTank", ""),
+        ("projects.body.html", "projects/index.html", "projects", "../", "projects/",
+         "プロジェクト | PMI ThinkTank", ""),
+        ("contact.body.html", "contact/index.html", "contact", "../", "contact/",
+         "お問い合わせ | PMI ThinkTank", ""),
     ]
-    # index のパーシャル名だけ別（body ファイル名）
-    index_body = "index.body.html"
-    for partial, out, title, desc in pages:
-        src = partials / (index_body if out == "index.html" else partial)
-        body = src.read_text(encoding="utf-8")
-        if out == "index.html":
+    for partial, out, active, prefix, canonical, title, desc in pages:
+        body = (partials / partial).read_text(encoding="utf-8")
+        if active == "index":
             body = body.replace("<!--LATEST_POSTS-->", home_cards(posts, n))
-        active = "index.html" if out == "index.html" else out
-        (SITE_ROOT / out).write_text(
-            site_shell(title, active, body, desc), encoding="utf-8")
-    print(f"  トップレベル生成: index / about / projects / contact（最新{min(n, len(posts))}件掲載）")
+        out_path = SITE_ROOT / out
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(
+            site_shell(title, active, body, prefix, canonical, desc), encoding="utf-8")
+    print(f"  トップレベル生成: / /about/ /projects/ /contact/（最新{min(n, len(posts))}件掲載）")
 
 # ---- main -------------------------------------------------------------------
 

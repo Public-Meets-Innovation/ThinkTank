@@ -161,6 +161,9 @@ img { max-width: 100%; height: auto; }
 .more-link::after { content: " →"; }
 
 /* ===== Projects ===== */
+/* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
+#projects .section__head,
+#projects .about__lead { padding-left: 37px; }
 .projects { display: grid; gap: 24px; margin-top: 8px; }
 .project {
   border: 1px solid var(--line);
@@ -215,4 +218,6 @@ img { max-width: 100%; height: auto; }
   .section { padding: 60px 0; }
   .hero { padding: 80px 0 88px; }
   .project { padding: 24px; }
+  #projects .section__head,
+  #projects .about__lead { padding-left: 25px; }
 }
