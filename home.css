@@ -45,8 +45,8 @@ img { max-width: 100%; height: auto; }
   align-items: center;
   justify-content: space-between;
 }
-.nav__logo { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
-.nav__logo .dot { color: var(--accent); }
+.nav__logo { display: flex; align-items: center; }
+.nav__logo img { height: 32px; width: auto; display: block; }
 .nav__links { display: flex; gap: 24px; font-size: 15px; flex-wrap: wrap; }
 .nav__links a { color: var(--text-muted); padding-bottom: 2px; }
 .nav__links a:hover { color: var(--text); }
