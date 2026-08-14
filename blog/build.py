@@ -22,6 +22,11 @@ SITE_ROOT = ROOT.parent               # リポジトリのルート（トップ�
 SITE_BASE_URL = "https://public-meets-innovation.github.io/ThinkTank/"
 DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
 
+# 全ページ共通フォント（英数字: Helvetica Neue / 日本語: Noto Sans JP）
+FONT_LINKS = """  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />"""
+
 # 一覧上部のカテゴリナビ（表示順）
 CATEGORIES = [
     "All", "調査レポート", "論考", "解説", "プレスリリース",
@@ -29,13 +34,14 @@ CATEGORIES = [
 
 # ---- 共通パーツ -------------------------------------------------------------
 
-def social_meta_head(prefix, title, canonical_path, description=""):
+def social_meta_head(prefix, title, canonical_path, description="", image_path="logo.png"):
     """favicon と OGP / Twitter Card のメタタグ。
-    prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon・OGP画像はここから解決。
+    prefix: サイトルートまでの相対パス（例 "" / "../"）。favicon はここから解決。
     canonical_path: サイトルートからの絶対パス（例 "" / "about/" / "blog/xxx.html"）。og:url に使用。
+    image_path: サイトルートからの相対パス（例 "logo.png" / "blog/images/xxx.jpg"）。og:image に使用。
     """
     desc = description or DEFAULT_DESCRIPTION
-    image_url = SITE_BASE_URL + "logo.png"
+    image_url = SITE_BASE_URL + image_path
     page_url = SITE_BASE_URL + canonical_path
     return f"""  <link rel="icon" type="image/png" href="{prefix}favicon.png" />
   <meta property="og:type" content="website" />
@@ -110,9 +116,9 @@ def nav_html():
             f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
-def page(title, body, canonical_path="blog/", description=""):
+def page(title, body, canonical_path="blog/", description="", image_path="logo.png"):
     # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
-    social = social_meta_head("../", title, canonical_path, description)
+    social = social_meta_head("../", title, canonical_path, description, image_path)
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -120,8 +126,9 @@ def page(title, body, canonical_path="blog/", description=""):
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>
 {social}
+{FONT_LINKS}
 {THEME_HEAD_JS}
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
 {header_html()}
@@ -181,10 +188,13 @@ def render_article(p):
 {p["body_html"]}
     </div>
   </article>"""
+    # OGP画像は記事のサムネイルを優先。無ければ共通ロゴにフォールバック。
+    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "logo.png"
     out = ROOT / f'{p["slug"]}.html'
     out.write_text(
         page(f'{p["title"]} | PMI ThinkTank Blog', body,
-             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"]),
+             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"],
+             image_path=image_path),
         encoding="utf-8")
     return out.name
 
@@ -272,6 +282,43 @@ def site_nav(active, prefix):
             '    </div>\n'
             '  </nav>')
 
+# 「私たちについて」クラスタ内のサブナビ（私たちについて/メンバー/お問い合わせ）
+ABOUT_SUBNAV = [
+    ("about", "私たちについて"),
+    ("members", "メンバー"),
+    ("contact", "お問い合わせ"),
+]
+
+def about_subnav(active, prefix):
+    items = []
+    for key, label in ABOUT_SUBNAV:
+        cls = ' class="is-active"' if key == active else ''
+        items.append(f'        <a href="{prefix}{key}/"{cls}>{html.escape(label)}</a>')
+    return '      <div class="subnav">\n' + "\n".join(items) + "\n      </div>"
+
+# メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
+MEMBERS_LEADERSHIP = [
+    ("石山 アンジュ", "Chair"),
+    ("田中 佑典", "Executive Director"),
+]
+MEMBERS_STAFF = [
+    ("上野 裕太郎", "Head of Research"),
+    ("小林 駿斗", "Visiting Researcher"),
+]
+
+def member_cards(members):
+    cards = []
+    for name, role in members:
+        initial = name.strip()[0]
+        cards.append(f"""        <div class="member-card">
+          <div class="member-card__avatar" aria-hidden="true">{html.escape(initial)}</div>
+          <div class="member-card__body">
+            <div class="member-card__name">{html.escape(name)}</div>
+            <div class="member-card__role">{html.escape(role)}</div>
+          </div>
+        </div>""")
+    return "\n".join(cards)
+
 def site_footer():
     return ('  <footer class="site-foot">\n'
             '    <div class="wrap site-foot__inner">\n'
@@ -294,7 +341,8 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>{desc}
 {social}
-  <link rel="stylesheet" href="{prefix}home.css?v=6" />
+{FONT_LINKS}
+  <link rel="stylesheet" href="{prefix}home.css?v=7" />
 </head>
 <body>
 {site_nav(active, prefix)}
@@ -329,20 +377,29 @@ def render_toplevel(posts, n=3):
          "PMI ThinkTank", DEFAULT_DESCRIPTION),
         ("about.body.html", "about/index.html", "about", "../", "about/",
          "私たちについて | PMI ThinkTank", ""),
+        ("members.body.html", "members/index.html", "members", "../", "members/",
+         "メンバー | PMI ThinkTank", ""),
         ("projects.body.html", "projects/index.html", "projects", "../", "projects/",
          "プロジェクト | PMI ThinkTank", ""),
         ("contact.body.html", "contact/index.html", "contact", "../", "contact/",
          "お問い合わせ | PMI ThinkTank", ""),
     ]
+    # サブナビを持つページ（私たちについてクラスタ）
+    subnav_pages = {"about", "members", "contact"}
     for partial, out, active, prefix, canonical, title, desc in pages:
         body = (partials / partial).read_text(encoding="utf-8")
         if active == "index":
             body = body.replace("<!--LATEST_POSTS-->", home_cards(posts, n))
+        if active in subnav_pages:
+            body = body.replace("<!--SUBNAV-->", about_subnav(active, prefix))
+        if active == "members":
+            body = body.replace("<!--LEADERSHIP-->", member_cards(MEMBERS_LEADERSHIP))
+            body = body.replace("<!--STAFF-->", member_cards(MEMBERS_STAFF))
         out_path = SITE_ROOT / out
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(
             site_shell(title, active, body, prefix, canonical, desc), encoding="utf-8")
-    print(f"  トップレベル生成: / /about/ /projects/ /contact/（最新{min(n, len(posts))}件掲載）")
+    print(f"  トップレベル生成: / /about/ /members/ /projects/ /contact/（最新{min(n, len(posts))}件掲載）")
 
 # ---- main -------------------------------------------------------------------
 
