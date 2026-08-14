@@ -213,7 +213,7 @@ img { max-width: 100%; height: auto; }
 /* ===== Projects ===== */
 /* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
 #projects .section__head,
-#projects .about__lead { padding-left: 37px; }
+#projects .about__lead { padding-left: 37px; padding-right: 37px; max-width: none; }
 .projects { display: grid; gap: 24px; margin-top: 8px; }
 .project {
   border: 1px solid var(--line);
@@ -269,7 +269,7 @@ img { max-width: 100%; height: auto; }
   .hero { padding: 80px 0 88px; }
   .project { padding: 24px; }
   #projects .section__head,
-  #projects .about__lead { padding-left: 25px; }
+  #projects .about__lead { padding-left: 25px; padding-right: 25px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
   .members-grid { grid-template-columns: 1fr; gap: 28px; }
   .member-card__avatar { width: 84px; height: 84px; font-size: 30px; }
