@@ -214,6 +214,11 @@ img { max-width: 100%; height: auto; }
 /* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
 #projects .section__head,
 #projects .about__lead { padding-left: 37px; padding-right: 37px; max-width: none; }
+/* 折り返した各行を右端まで揃える（最終行は除く、両端揃えの標準挙動） */
+#projects .about__lead {
+  text-align: justify;
+  text-justify: inter-character;
+}
 .projects { display: grid; gap: 24px; margin-top: 8px; }
 .project {
   border: 1px solid var(--line);
