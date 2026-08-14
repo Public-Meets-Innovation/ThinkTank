@@ -299,7 +299,7 @@ def about_subnav(active, prefix):
 # メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
 MEMBERS_LEADERSHIP = [
     ("石山 アンジュ", "Chair"),
-    ("田中 佑典", "Executive Director"),
+    ("田中 祐典", "Executive Director"),
 ]
 MEMBERS_STAFF = [
     ("上野 裕太郎", "Head of Research"),
