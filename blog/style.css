@@ -121,15 +121,13 @@ img {
 }
 
 .logo {
-  font-size: 44px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
   display: block;
 }
 
-.logo .dot {
-  color: var(--accent);
+.logo img {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 
 .logo__sub {

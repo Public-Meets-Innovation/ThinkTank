@@ -61,7 +61,7 @@ def header_html():
       <div class="site-header__left">
         <a href="../" class="site-home">← PMI ThinkTank</a>
         <a href="index.html" class="logo">
-          PMI ThinkTank Blog
+          <img src="../logo.png" alt="PMI ThinkTank" />
         </a>
       </div>
       <button class="theme-toggle" type="button" role="switch" aria-label="ライト/ダーク切り替え"><span class="tt-opt" data-mode="L">L</span><span class="tt-opt" data-mode="D">D</span></button>
@@ -276,7 +276,7 @@ def site_nav(active, prefix):
     home = prefix if prefix else './'
     return ('  <nav class="nav">\n'
             '    <div class="nav__inner">\n'
-            f'      <a href="{home}" class="nav__logo">PMI ThinkTank</a>\n'
+            f'      <a href="{home}" class="nav__logo"><img src="{prefix}logo.png" alt="PMI ThinkTank" /></a>\n'
             '      <div class="nav__links">\n' + "\n".join(links) + "\n"
             '      </div>\n'
             '    </div>\n'
