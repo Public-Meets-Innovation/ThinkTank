@@ -19,7 +19,7 @@ POSTS_DIR = ROOT / "posts"
 SITE_ROOT = ROOT.parent               # リポジトリのルート（トップページを置く場所）
 
 # 本番公開URL（OGPの絶対URL生成に使用）。logo.png / favicon.png はリポジトリルート直下。
-SITE_BASE_URL = "https://public-meets-innovation.github.io/ThinkTank/"
+SITE_BASE_URL = "https://thinktank.pmi.or.jp/"
 DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
 
 # 全ページ共通フォント（英数字: Helvetica Neue / 日本語: Noto Sans JP）
@@ -342,7 +342,7 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
   <title>{html.escape(title)}</title>{desc}
 {social}
 {FONT_LINKS}
-  <link rel="stylesheet" href="{prefix}home.css?v=7" />
+  <link rel="stylesheet" href="{prefix}home.css?v=8" />
 </head>
 <body>
 {site_nav(active, prefix)}
