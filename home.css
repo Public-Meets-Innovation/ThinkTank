@@ -14,7 +14,8 @@
 html { scroll-behavior: smooth; scrollbar-gutter: stable; overflow-y: scroll; }
 
 body {
-  font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN",
+  /* 英数字は Helvetica Neue、日本語は Noto Sans JP（グリフの無い文字は自動でフォールバック） */
+  font-family: "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
     "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -160,6 +161,56 @@ img { max-width: 100%; height: auto; }
 .more-link { display: inline-block; margin-top: 36px; font-size: 16px; font-weight: 700; color: var(--accent); }
 .more-link::after { content: " →"; }
 
+/* ===== Sub nav（私たちについて/メンバー/お問い合わせ クラスタ） ===== */
+.subnav {
+  display: flex;
+  gap: 28px;
+  margin: 28px 0 40px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+.subnav a { color: var(--text-muted); padding-bottom: 4px; }
+.subnav a:hover { color: var(--text); }
+.subnav a.is-active { color: var(--text); font-weight: 700; border-bottom: 2px solid var(--accent); }
+
+/* ===== Members ===== */
+.members__group {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+.members-grid + .members__group { margin-top: 48px; }
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  background: #fff;
+}
+.member-card__avatar {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.member-card__name { font-weight: 700; font-size: 16px; }
+.member-card__role { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
 /* ===== Projects ===== */
 /* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
 #projects .section__head,
@@ -220,4 +271,6 @@ img { max-width: 100%; height: auto; }
   .project { padding: 24px; }
   #projects .section__head,
   #projects .about__lead { padding-left: 25px; }
+  .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
+  .members-grid { grid-template-columns: 1fr; }
 }

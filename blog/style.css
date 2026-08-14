@@ -40,7 +40,8 @@ html {
 }
 
 body {
-  font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN",
+  /* 英数字は Helvetica Neue、日本語は Noto Sans JP（グリフの無い文字は自動でフォールバック） */
+  font-family: "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
     "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
   color: var(--text);
   background: var(--bg);
