@@ -211,9 +211,10 @@ img { max-width: 100%; height: auto; }
 .member-card__role { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
 
 /* ===== Projects ===== */
-/* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
-#projects .section__head,
-#projects .about__lead { padding-left: 37px; padding-right: 37px; max-width: none; }
+/* 見出し・リード文・カードの「外枠」をすべて同じ位置に揃える（テキスト同士ではなく箱同士）。
+   カード内の見出し/本文は独自のパディングでさらに内側にインセットされるのが通常の
+   カードレイアウトの挙動であり、それは意図通り。 */
+#projects .about__lead { max-width: none; }
 /* 折り返した各行を右端まで揃える（最終行は除く、両端揃えの標準挙動） */
 #projects .about__lead {
   text-align: justify;
@@ -273,8 +274,6 @@ img { max-width: 100%; height: auto; }
   .section { padding: 60px 0; }
   .hero { padding: 80px 0 88px; }
   .project { padding: 24px; }
-  #projects .section__head,
-  #projects .about__lead { padding-left: 25px; padding-right: 25px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
   .members-grid { grid-template-columns: 1fr; gap: 28px; }
   .member-card__avatar { width: 84px; height: 84px; font-size: 30px; }
