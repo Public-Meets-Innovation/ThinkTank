@@ -176,40 +176,39 @@ img { max-width: 100%; height: auto; }
 
 /* ===== Members ===== */
 .members__group {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
-  margin: 0 0 20px;
+  margin: 0 0 32px;
 }
-.members-grid + .members__group { margin-top: 48px; }
+.members-grid + .members__group { margin-top: 56px; }
 .members-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 40px 32px;
 }
 .member-card {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 20px;
-  background: #fff;
+  align-items: flex-start;
+  gap: 18px;
 }
 .member-card__avatar {
   flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  width: 104px;
+  height: 104px;
+  border-radius: 6px;
   background: var(--accent);
   color: #fff;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
-.member-card__name { font-weight: 700; font-size: 16px; }
-.member-card__role { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.member-card__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.member-card__body { padding-top: 4px; }
+.member-card__name { font-weight: 700; font-size: 17px; }
+.member-card__role { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
 
 /* ===== Projects ===== */
 /* 見出し・リード文をカード内テキスト（枠1px＋左パディング36px）と左端で揃える */
@@ -272,5 +271,6 @@ img { max-width: 100%; height: auto; }
   #projects .section__head,
   #projects .about__lead { padding-left: 25px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
-  .members-grid { grid-template-columns: 1fr; }
+  .members-grid { grid-template-columns: 1fr; gap: 28px; }
+  .member-card__avatar { width: 84px; height: 84px; font-size: 30px; }
 }
