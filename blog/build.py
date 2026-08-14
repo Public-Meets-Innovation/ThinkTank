@@ -11,12 +11,25 @@ posts/ 内の *.md を読み込み、記事ページと index.html を生成す�
 
 import re
 import html
+import hashlib
 from pathlib import Path
 import markdown
 
 ROOT = Path(__file__).parent          # blog/ ディレクトリ
 POSTS_DIR = ROOT / "posts"
 SITE_ROOT = ROOT.parent               # リポジトリのルート（トップページを置く場所）
+
+def _asset_ver(path):
+    """CSSファイルの中身のハッシュをキャッシュバスターにする。
+    手動でバージョン番号を上げ忘れて古いCSSがキャッシュされ続ける事故を防ぐため、
+    内容が変われば自動的にクエリ文字列も変わる仕組みにしている。"""
+    try:
+        return hashlib.md5(path.read_bytes()).hexdigest()[:8]
+    except FileNotFoundError:
+        return "0"
+
+HOME_CSS_VER = _asset_ver(SITE_ROOT / "home.css")
+BLOG_CSS_VER = _asset_ver(ROOT / "style.css")
 
 # 本番公開URL（OGPの絶対URL生成に使用）。logo.png / favicon.png はリポジトリルート直下。
 SITE_BASE_URL = "https://thinktank.pmi.or.jp/"
@@ -128,7 +141,7 @@ def page(title, body, canonical_path="blog/", description="", image_path="logo.p
 {social}
 {FONT_LINKS}
 {THEME_HEAD_JS}
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v={BLOG_CSS_VER}" />
 </head>
 <body>
 {header_html()}
@@ -342,7 +355,7 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
   <title>{html.escape(title)}</title>{desc}
 {social}
 {FONT_LINKS}
-  <link rel="stylesheet" href="{prefix}home.css?v=8" />
+  <link rel="stylesheet" href="{prefix}home.css?v={HOME_CSS_VER}" />
 </head>
 <body>
 {site_nav(active, prefix)}
