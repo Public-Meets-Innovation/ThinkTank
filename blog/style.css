@@ -1,6 +1,36 @@
 /* ===== PMI ThinkTank Blog — sakana.ai風レイアウト ===== */
 
+/* ===== 文字種によるフォントの割り当て（home.css と同一のルール） =====
+   半角（ASCII / Latin-1）→ Helvetica Neue、全角（日本語）→ Noto Sans JP。
+   unicode-range で Helvetica Neue を半角に限定し、範囲外は Noto Sans JP に落とす。 */
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue"), local("HelveticaNeue"), local("Helvetica");
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue Medium"), local("HelveticaNeue-Medium"),
+       local("Helvetica Neue"), local("Helvetica");
+  font-weight: 500;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue Bold"), local("HelveticaNeue-Bold"),
+       local("Helvetica Bold"), local("Helvetica");
+  font-weight: 700;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
 :root {
+  --font-sans: "PMI Latin", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+
   --text: #1a1a1a;
   --text-muted: #8a8a8a;
   --text-light: #b0b0b0;
@@ -40,13 +70,27 @@ html {
 }
 
 body {
-  /* 英数字は Helvetica Neue、日本語は Noto Sans JP（グリフの無い文字は自動でフォールバック） */
-  font-family: "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text);
   background: var(--bg);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+}
+
+/* キーボード操作時のフォーカスを明示（マウスクリックでは出さない） */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* モーションを控える設定を尊重する */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 a {
