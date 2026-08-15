@@ -1,11 +1,49 @@
 /* ===== PMI ThinkTank トップページ ===== */
 
+/* ===== 文字種によるフォントの割り当て（サイト共通ルール） =====
+   半角（ラテン文字・数字・記号 = ASCII と Latin-1）→ Helvetica Neue
+   全角（日本語）                                   → Noto Sans JP
+
+   単にフォントを並べる指定だと「Noto Sans JP にも英数字が入っている」ため、
+   環境によって半角がどちらで出るかが揺れる。unicode-range で Helvetica Neue の
+   適用範囲を半角に限定し、そこから外れる文字は必ず Noto Sans JP に落とす。
+   ウェイトごとに実体が異なるため 400 / 500 / 700 を個別に宣言する。       */
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue"), local("HelveticaNeue"), local("Helvetica");
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue Medium"), local("HelveticaNeue-Medium"),
+       local("Helvetica Neue"), local("Helvetica");
+  font-weight: 500;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+@font-face {
+  font-family: "PMI Latin";
+  src: local("Helvetica Neue Bold"), local("HelveticaNeue-Bold"),
+       local("Helvetica Bold"), local("Helvetica");
+  font-weight: 700;
+  font-style: normal;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
 :root {
+  --font-sans: "PMI Latin", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+
   --text: #1a1a1a;
   --text-muted: #7a7a7a;
   --line: #ececec;
+  /* ベースのネイビー1色（ヒーロー・フッターの面）とアクセント1色のみ。
+     旧 --accent-dark（濃いティール）はネイビーに統合し、色数を増やさない。 */
+  --navy: #0F2233;
   --accent: #1a5f7a;
-  --accent-dark: #0f3d4d;
+  --accent-dark: var(--navy);
   --bg: #ffffff;
   --max: 1080px;
 }
@@ -14,13 +52,32 @@
 html { scroll-behavior: smooth; scrollbar-gutter: stable; overflow-y: scroll; }
 
 body {
-  /* 英数字は Helvetica Neue、日本語は Noto Sans JP（グリフの無い文字は自動でフォールバック） */
-  font-family: "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text);
   background: var(--bg);
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
+}
+
+/* キーボード操作時のフォーカスを明示（マウスクリックでは出さない） */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* 濃い面の上では白のアウトラインに切り替える */
+.hero :focus-visible,
+.site-foot :focus-visible {
+  outline-color: #fff;
+}
+
+/* モーションを控える設定を尊重する */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 a { color: inherit; text-decoration: none; }
@@ -46,7 +103,8 @@ img { max-width: 100%; height: auto; }
   justify-content: space-between;
 }
 .nav__logo { display: flex; align-items: center; }
-.nav__logo img { height: 32px; width: auto; display: block; }
+/* 32px ではアイコン部分が潰れて見えるため引き上げる */
+.nav__logo img { height: 40px; width: auto; display: block; }
 .nav__links { display: flex; gap: 24px; font-size: 15px; flex-wrap: wrap; }
 .nav__links a { color: var(--text-muted); padding-bottom: 2px; }
 .nav__links a:hover { color: var(--text); }
@@ -54,18 +112,22 @@ img { max-width: 100%; height: auto; }
 
 /* ===== Hero ===== */
 .hero {
-  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  /* グラデーションを廃してフラットな単色に。装飾（画像・テクスチャ・図形）は置かない。
+     #0F2233 と白のコントラスト比は約 16.5:1（WCAG AA の 4.5:1 を大きく満たす）。 */
+  background: var(--navy);
   color: #fff;
-  /* 画面の高さに対して十分な存在感を持たせる。小さい画面では padding が支配的に */
-  min-height: 78vh;
+  /* CTA下の余りを詰める。次セクションの見出しがわずかに覗く高さ。
+     余白そのものは残し、削るのは「余り」の部分だけ。 */
+  min-height: 62vh;
   display: flex;
   align-items: center;
-  padding: 120px 0 132px;
+  padding: 88px 0 96px;
 }
 .hero h1 {
   /* 画面幅に応じて滑らかに変化（狭い端末〜大型ディスプレイまで1本の指定で対応） */
   font-size: clamp(32px, 5.2vw, 68px);
-  font-weight: 700;
+  /* 太さを落として、大きさに頼らない静かな見出しにする */
+  font-weight: 500;
   line-height: 1.32;
   letter-spacing: -0.02em;
   max-width: 15em;
@@ -76,25 +138,34 @@ img { max-width: 100%; height: auto; }
   margin-top: 30px;
   font-size: clamp(16px, 1.5vw, 20px);
   color: rgba(255, 255, 255, 0.88);
-  max-width: 38em;
+  /* 1行あたり概ね30〜38文字に収める */
+  max-width: 42em;
   line-break: strict;
-  word-break: auto-phrase;
   text-wrap: pretty;
+}
+/* 読点の位置（意味の切れ目）で折り返す。<br> による固定改行は使わない。
+   節そのものが1行に収まらない狭い画面では、かえって短い孤立行が出るため
+   広い画面に限定し、狭い画面では通常どおり流し込む。 */
+@media (min-width: 821px) {
+  .hero p span { display: inline-block; }
 }
 .hero__cta {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 42px;
-  background: #fff;
-  color: var(--accent-dark);
-  font-weight: 700;
-  font-size: 17px;
-  padding: 16px 34px;
-  border-radius: 999px;
-  transition: transform 0.15s, box-shadow 0.15s;
+  margin-top: 40px;
+  /* 塗りではなく白のアウトライン。角丸はごく浅く。 */
+  border: 1px solid #fff;
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  padding: 15px 32px;
+  transition: background-color 0.15s, color 0.15s;
 }
-.hero__cta:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.18); }
+/* ホバーで白ベタ反転 */
+.hero__cta:hover { background: #fff; color: var(--navy); }
 
 /* ===== Section ===== */
 .section { padding: 88px 0; }
