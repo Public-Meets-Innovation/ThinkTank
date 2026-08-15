@@ -56,20 +56,27 @@ img { max-width: 100%; height: auto; }
 .hero {
   background: linear-gradient(135deg, var(--accent-dark), var(--accent));
   color: #fff;
-  padding: 110px 0 120px;
+  /* 画面の高さに対して十分な存在感を持たせる。小さい画面では padding が支配的に */
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 0 132px;
 }
 .hero h1 {
-  font-size: 48px;
+  /* 画面幅に応じて滑らかに変化（狭い端末〜大型ディスプレイまで1本の指定で対応） */
+  font-size: clamp(32px, 5.2vw, 68px);
   font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-  max-width: 20em;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  max-width: 15em;
 }
+/* 節ごとにまとまって折り返す（節の途中で切れないようにする） */
+.hero h1 span { display: inline-block; }
 .hero p {
-  margin-top: 22px;
-  font-size: 18px;
+  margin-top: 30px;
+  font-size: clamp(16px, 1.5vw, 20px);
   color: rgba(255, 255, 255, 0.88);
-  max-width: 40em;
+  max-width: 38em;
   line-break: strict;
   word-break: auto-phrase;
   text-wrap: pretty;
@@ -78,12 +85,12 @@ img { max-width: 100%; height: auto; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 34px;
+  margin-top: 42px;
   background: #fff;
   color: var(--accent-dark);
   font-weight: 700;
-  font-size: 16px;
-  padding: 14px 28px;
+  font-size: 17px;
+  padding: 16px 34px;
   border-radius: 999px;
   transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -267,12 +274,12 @@ img { max-width: 100%; height: auto; }
 .site-foot__social a:hover { text-decoration: underline; }
 
 @media (max-width: 820px) {
-  .hero h1 { font-size: 34px; }
+  /* h1/p のサイズは clamp() が担うため、ここでは余白のみ調整 */
   .about__grid, .home-cards { grid-template-columns: 1fr; }
   .nav__inner { flex-wrap: wrap; gap: 8px 20px; }
   .nav__links { gap: 16px; font-size: 14px; }
   .section { padding: 60px 0; }
-  .hero { padding: 80px 0 88px; }
+  .hero { min-height: 0; padding: 88px 0 96px; }
   .project { padding: 24px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
   .members-grid { grid-template-columns: 1fr; gap: 28px; }
