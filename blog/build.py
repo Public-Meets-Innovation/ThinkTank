@@ -36,6 +36,26 @@ BLOG_CSS_VER = _asset_ver(ROOT / "style.css")
 SITE_BASE_URL = "https://thinktank.pmi.or.jp/"
 DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
 
+# 生成物であることを明示するバナー。生成HTMLを直接編集してもビルド時に
+# 上書きされてしまうため、編集すべき元ファイルの場所をここで案内する。
+GENERATED_BANNER = """<!--
+  ============================================================
+  このファイルは build.py が自動生成しています。直接編集しないでください。
+  （編集してもビルド時に上書きされ、公開サイトには反映されません）
+
+  編集する場所:
+    ・トップ/私たちについて/メンバー/プロジェクト/お問い合わせ
+        → partials/*.body.html
+    ・ブログ記事
+        → blog/posts/*.md
+    ・共通のヘッダー/フッター/メタタグ
+        → blog/build.py
+
+  反映方法: python blog/build.py を実行してコミット
+           （main にマージすると GitHub Actions が自動ビルドします）
+  ============================================================
+-->"""
+
 # 全ページ共通フォント（英数字: Helvetica Neue / 日本語: Noto Sans JP）
 FONT_LINKS = """  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -174,6 +194,7 @@ def page(title, body, canonical_path="blog/", description="", image_path="ogp.pn
     # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
     social = social_meta_head("../", title, canonical_path, description, image_path)
     return f"""<!DOCTYPE html>
+{GENERATED_BANNER}
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -389,6 +410,7 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
             if description else "")
     social = social_meta_head(prefix, title, canonical_path, description)
     return f"""<!DOCTYPE html>
+{GENERATED_BANNER}
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
