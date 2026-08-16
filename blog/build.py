@@ -372,24 +372,34 @@ def about_subnav(active, prefix):
     return '      <div class="subnav">\n' + "\n".join(items) + "\n      </div>"
 
 # メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
+# (氏名, 役職, 専門領域)。専門領域は任意で、空文字なら行ごと出力しない。
 MEMBERS_LEADERSHIP = [
-    ("石山 アンジュ", "Chair"),
-    ("田中 佑典", "Executive Director"),
+    ("石山 アンジュ", "Chair", ""),
+    ("田中 佑典", "Executive Director", ""),
 ]
 MEMBERS_STAFF = [
-    ("上野 裕太郎", "Head of Research"),
-    ("小林 駿斗", "Visiting Researcher"),
+    ("上野 裕太郎", "Head of Research", "社会学／社会とテクノロジー"),
+    ("小林 駿斗", "Visiting Researcher", "ポスト・デジタル社会／テクノロジーと法"),
 ]
 
 def member_cards(members):
     cards = []
-    for name, role in members:
+    for name, role, field in members:
         initial = name.strip()[0]
+        field_html = ""
+        if field:
+            # 「／」区切りの各領域を inline-block で包み、折り返しが区切り位置で
+            # 起きるようにする（「テクノロ／ジーと法」のような語中での分断を防ぐ）。
+            segs = field.split("／")
+            inner = "".join(
+                f'<span>{html.escape(s)}{"／" if i < len(segs) - 1 else ""}</span>'
+                for i, s in enumerate(segs))
+            field_html = f'\n            <div class="member-card__field">{inner}</div>'
         cards.append(f"""        <div class="member-card">
           <div class="member-card__avatar" aria-hidden="true">{html.escape(initial)}</div>
           <div class="member-card__body">
             <div class="member-card__name">{html.escape(name)}</div>
-            <div class="member-card__role">{html.escape(role)}</div>
+            <div class="member-card__role">{html.escape(role)}</div>{field_html}
           </div>
         </div>""")
     return "\n".join(cards)
