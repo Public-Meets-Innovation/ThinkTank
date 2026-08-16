@@ -261,10 +261,10 @@ img { max-width: 100%; height: auto; }
 .members-grid + .members__group { margin-top: 56px; }
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
-/* 枠線で囲み、写真をカードの左端いっぱいに置く */
+/* 枠線で囲み、正方形の写真をカードの左端に置く */
 .member-card {
   display: flex;
   align-items: stretch;
@@ -274,12 +274,16 @@ img { max-width: 100%; height: auto; }
 }
 .member-card__photo {
   flex: none;
-  width: 104px;
-  align-self: stretch;
+  width: 136px;
+  /* 正方形に固定し、カードの高さに引き伸ばさない。
+     専門領域の行があるカードは写真より背が高くなるため、上下中央に置いて
+     下側だけに余白が寄るのを避ける。 */
+  aspect-ratio: 1 / 1;
+  align-self: center;
   background: var(--accent);
   color: #fff;
   font-weight: 700;
-  font-size: 34px;
+  font-size: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,8 +305,8 @@ img { max-width: 100%; height: auto; }
   color: var(--text-muted);
   line-height: 1.6;
   margin-top: 4px;
-  /* 3列だと1行に収まらないことがある。折り返す場合も語中では切らず、
-     文節の切れ目で折り返す（「テクノロ／ジー」のような分断を防ぐ）。 */
+  /* 2列なら1行に収まるが、より長い領域名が入った場合の保険として、
+     折り返す際も語中では切らず文節の切れ目で折り返すようにしておく。 */
   word-break: auto-phrase;
   line-break: strict;
 }
