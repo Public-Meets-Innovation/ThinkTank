@@ -253,6 +253,10 @@ img { max-width: 100%; height: auto; }
 .subnav a.is-active { color: var(--text); font-weight: 700; border-bottom: 2px solid var(--accent); }
 
 /* ===== Members ===== */
+/* カードを3列で並べるページなので、他ページ（1080px）より横幅を広く取る。
+   1080px のままだとカード1枚が約328pxで、写真と内側余白を引いた文字領域が
+   182pxしかなく、専門領域が語中で折り返してしまう。 */
+#members .wrap { max-width: 1280px; }
 .members__group {
   font-size: 26px;
   font-weight: 700;
@@ -262,42 +266,75 @@ img { max-width: 100%; height: auto; }
 .members-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px 32px;
+  gap: 24px;
 }
+/* 枠線で囲み、写真をカードの左端いっぱいに置く */
 .member-card {
   display: flex;
-  align-items: flex-start;
-  gap: 18px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  background: #fff;
+  overflow: hidden;
 }
-.member-card__avatar {
+.member-card__photo {
   flex: none;
   width: 104px;
-  height: 104px;
-  border-radius: 6px;
+  align-self: stretch;
   background: var(--accent);
   color: #fff;
   font-weight: 700;
-  font-size: 36px;
+  font-size: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
-.member-card__avatar img { width: 100%; height: 100%; object-fit: cover; }
-.member-card__body { padding-top: 4px; }
-.member-card__name { font-weight: 700; font-size: 17px; }
+.member-card__photo img { width: 100%; height: 100%; object-fit: cover; }
+.member-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.member-card__name { font-weight: 700; font-size: 17px; line-height: 1.4; }
 .member-card__role { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
-/* 専門領域。役職より一段弱く見せ、罫線で役職と切り分ける */
+/* 専門領域は役職の直下。区切り線は入れない。 */
 .member-card__field {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
   line-height: 1.6;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+  margin-top: 4px;
 }
-/* 「／」の区切りでまとまって折り返す（語中で切れないように） */
-.member-card__field span { display: inline-block; }
+/* Xアイコンと View Bio はカード下部の右寄せ */
+.member-card__actions {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.member-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.member-card__icon:hover { color: var(--text); }
+.member-card__bio {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.member-card__bio:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
 
 /* ===== Projects ===== */
 /* 見出し・リード文・カードの「外枠」をすべて同じ位置に揃える（テキスト同士ではなく箱同士）。
@@ -364,6 +401,6 @@ img { max-width: 100%; height: auto; }
   .hero { min-height: 0; padding: 88px 0 96px; }
   .project { padding: 24px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
-  .members-grid { grid-template-columns: 1fr; gap: 28px; }
-  .member-card__avatar { width: 84px; height: 84px; font-size: 30px; }
+  .members-grid { grid-template-columns: 1fr; gap: 16px; }
+  .member-card__photo { width: 88px; font-size: 30px; }
 }
