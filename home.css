@@ -368,7 +368,7 @@ img { max-width: 100%; height: auto; }
 .member-detail__name { font-size: 30px; font-weight: 700; line-height: 1.35; }
 .member-detail__role { font-size: 16px; color: var(--text-muted); margin-top: 6px; }
 .member-detail__field { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
-.member-detail__x {
+.member-detail__twitter {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -377,7 +377,7 @@ img { max-width: 100%; height: auto; }
   color: var(--text-muted);
   transition: color 0.15s;
 }
-.member-detail__x:hover { color: var(--text); }
+.member-detail__twitter:hover { color: var(--text); }
 .member-detail__bio { margin-top: 32px; max-width: 720px; }
 .member-detail__bio p { font-size: 16px; color: #333; margin-bottom: 18px; }
 
