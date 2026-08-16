@@ -392,11 +392,15 @@ MEMBERS_STAFF = [
 ]
 ALL_MEMBERS = MEMBERS_LEADERSHIP + MEMBERS_STAFF
 
-# X（旧Twitter）のロゴ
-X_ICON = ('<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" '
-          'aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17'
-          'l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 '
-          '17.52h1.833L7.084 4.126H5.117z"/></svg>')
+# Twitter のロゴ（鳥）
+TWITTER_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" '
+          'aria-hidden="true"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 '
+          '2.163-2.723 9.99 9.99 0 0 1-3.127 1.195 4.92 4.92 0 0 0-8.384 4.482'
+          'C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 '
+          '2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 '
+          '4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1'
+          '-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 '
+          '13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z"/></svg>')
 
 def member_cards(members, prefix="../"):
     cards = []
@@ -415,7 +419,7 @@ def member_cards(members, prefix="../"):
             actions.append(
                 f'<a class="member-card__icon" href="https://x.com/{html.escape(twitter)}" '
                 f'target="_blank" rel="noopener" '
-                f'aria-label="{html.escape(name)}のX（旧Twitter）">{X_ICON}</a>')
+                f'aria-label="{html.escape(name)}のTwitter">{TWITTER_ICON}</a>')
         # 個人ページは全員分を生成しているので View Bio は常に出す
         actions.append(
             f'<a class="member-card__bio" href="{prefix}members/'
@@ -527,9 +531,9 @@ def render_member_pages():
                  if m.get("field") else "")
         twitter = ""
         if m.get("twitter"):
-            twitter = (f'\n          <a class="member-detail__x" '
+            twitter = (f'\n          <a class="member-detail__twitter" '
                        f'href="https://x.com/{html.escape(m["twitter"])}" '
-                       f'target="_blank" rel="noopener">{X_ICON}<span>@{html.escape(m["twitter"])}</span></a>')
+                       f'target="_blank" rel="noopener">{TWITTER_ICON}<span>@{html.escape(m["twitter"])}</span></a>')
         # bio は段落の配列。未設定なら本文は空のまま。
         bio_html = "\n".join(
             f'        <p>{html.escape(p)}</p>' for p in m.get("bio", []))
