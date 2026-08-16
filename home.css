@@ -287,6 +287,17 @@ img { max-width: 100%; height: auto; }
 .member-card__body { padding-top: 4px; }
 .member-card__name { font-weight: 700; font-size: 17px; }
 .member-card__role { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+/* 専門領域。役職より一段弱く見せ、罫線で役職と切り分ける */
+.member-card__field {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+/* 「／」の区切りでまとまって折り返す（語中で切れないように） */
+.member-card__field span { display: inline-block; }
 
 /* ===== Projects ===== */
 /* 見出し・リード文・カードの「外枠」をすべて同じ位置に揃える（テキスト同士ではなく箱同士）。
