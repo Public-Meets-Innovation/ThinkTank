@@ -386,7 +386,7 @@ MEMBERS_LEADERSHIP = [
 ]
 MEMBERS_STAFF = [
     {"slug": "ueno", "name": "上野 裕太郎", "role": "Head of Research",
-     "field": "社会学／社会とテクノロジー"},
+     "field": "社会学／社会とテクノロジー", "twitter": "yutaro_0518"},
     {"slug": "kobayashi", "name": "小林 駿斗", "role": "Visiting Researcher",
      "field": "ポスト・デジタル社会／テクノロジーと法"},
 ]
