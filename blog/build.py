@@ -386,21 +386,20 @@ def member_cards(members):
     cards = []
     for name, role, field in members:
         initial = name.strip()[0]
-        field_html = ""
-        if field:
-            # 「／」区切りの各領域を inline-block で包み、折り返しが区切り位置で
-            # 起きるようにする（「テクノロ／ジーと法」のような語中での分断を防ぐ）。
-            segs = field.split("／")
-            inner = "".join(
-                f'<span>{html.escape(s)}{"／" if i < len(segs) - 1 else ""}</span>'
-                for i, s in enumerate(segs))
-            field_html = f'\n            <div class="member-card__field">{inner}</div>'
+        # 専門領域はアバターの右ではなくカード幅いっぱいに置く。横に並べると
+        # 3カラム時に幅が足りず折り返してしまうため（「／」は区切り記号であって
+        # 改行位置ではない）。
+        field_html = (
+            f'\n          <div class="member-card__field">{html.escape(field)}</div>'
+            if field else "")
         cards.append(f"""        <div class="member-card">
-          <div class="member-card__avatar" aria-hidden="true">{html.escape(initial)}</div>
-          <div class="member-card__body">
-            <div class="member-card__name">{html.escape(name)}</div>
-            <div class="member-card__role">{html.escape(role)}</div>{field_html}
-          </div>
+          <div class="member-card__head">
+            <div class="member-card__avatar" aria-hidden="true">{html.escape(initial)}</div>
+            <div class="member-card__body">
+              <div class="member-card__name">{html.escape(name)}</div>
+              <div class="member-card__role">{html.escape(role)}</div>
+            </div>
+          </div>{field_html}
         </div>""")
     return "\n".join(cards)
 

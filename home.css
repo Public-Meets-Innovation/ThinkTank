@@ -264,7 +264,9 @@ img { max-width: 100%; height: auto; }
   grid-template-columns: repeat(3, 1fr);
   gap: 40px 32px;
 }
-.member-card {
+/* 1列3人。氏名・役職はアバターの右、専門領域はその下にカード幅いっぱいで置く */
+.member-card { display: block; }
+.member-card__head {
   display: flex;
   align-items: flex-start;
   gap: 18px;
@@ -287,17 +289,17 @@ img { max-width: 100%; height: auto; }
 .member-card__body { padding-top: 4px; }
 .member-card__name { font-weight: 700; font-size: 17px; }
 .member-card__role { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
-/* 専門領域。役職より一段弱く見せ、罫線で役職と切り分ける */
+/* 専門領域。役職より一段弱く見せ、罫線で氏名・役職と切り分ける。
+   「／」は区切り記号であって改行位置ではないため、折り返さずに1行で出す。 */
 .member-card__field {
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.6;
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
+  white-space: nowrap;
 }
-/* 「／」の区切りでまとまって折り返す（語中で切れないように） */
-.member-card__field span { display: inline-block; }
 
 /* ===== Projects ===== */
 /* 見出し・リード文・カードの「外枠」をすべて同じ位置に揃える（テキスト同士ではなく箱同士）。
