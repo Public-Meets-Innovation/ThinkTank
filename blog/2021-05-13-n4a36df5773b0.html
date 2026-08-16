@@ -4,13 +4,15 @@
   このファイルは build.py が自動生成しています。直接編集しないでください。
   （編集してもビルド時に上書きされ、公開サイトには反映されません）
 
-  編集する場所:
-    ・トップ/私たちについて/メンバー/プロジェクト/お問い合わせ
-        → partials/*.body.html
+  編集する場所（すべて Markdown です）:
+    ・トップ/私たちについて/プロジェクト/お問い合わせ
+        → content/index.md, about.md, projects.md, contact.md
+    ・メンバー（1人1ファイル。ファイル名がURLになります）
+        → content/members/*.md
+    ・サイト名・メニュー名・フッターのリンクなど
+        → content/site.md
     ・ブログ記事
         → blog/posts/*.md
-    ・共通のヘッダー/フッター/メタタグ
-        → blog/build.py
 
   反映方法: python blog/build.py を実行してコミット
            （main にマージすると GitHub Actions が自動ビルドします）

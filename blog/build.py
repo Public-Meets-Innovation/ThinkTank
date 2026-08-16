@@ -14,10 +14,44 @@ import html
 import hashlib
 from pathlib import Path
 import markdown
+import yaml
 
 ROOT = Path(__file__).parent          # blog/ ディレクトリ
 POSTS_DIR = ROOT / "posts"
 SITE_ROOT = ROOT.parent               # リポジトリのルート（トップページを置く場所）
+CONTENT_DIR = SITE_ROOT / "content"   # ページ本文の Markdown 置き場
+
+# ---- content/ の Markdown を読む -------------------------------------------
+
+def load_md(path):
+    """--- で囲んだ YAML（frontmatter）と、その下の Markdown 本文を返す。
+    サイトの文言は全部 content/*.md にあり、HTML や Python を触らずに編集できる。"""
+    raw = path.read_text(encoding="utf-8")
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", raw, re.DOTALL)
+    if not m:
+        return {}, raw
+    meta = yaml.safe_load(m.group(1)) or {}
+    return meta, m.group(2)
+
+def md_to_html(text):
+    """Markdown を HTML に。空なら空文字。"""
+    text = (text or "").strip()
+    if not text:
+        return ""
+    return markdown.markdown(text, extensions=["extra", "sane_lists"])
+
+def inline_md(text):
+    """1行ぶんの Markdown（**強調** など）。<p> で包まない。"""
+    out = md_to_html(text)
+    return re.sub(r"^<p>(.*)</p>$", r"\1", out, flags=re.DOTALL).strip()
+
+def clause_spans(text):
+    """読点で区切って <span> に包む。inline-block と組み合わせることで、
+    折り返しが語句の途中ではなく意味の切れ目で起きるようにする。"""
+    parts = [p for p in re.split(r"(?<=、)", text) if p]
+    return "".join(f"<span>{inline_md(p)}</span>" for p in parts)
+
+SITE, _ = load_md(CONTENT_DIR / "site.md")
 
 def _asset_ver(path):
     """CSSファイルの中身のハッシュをキャッシュバスターにする。
@@ -33,8 +67,8 @@ BLOG_CSS_VER = _asset_ver(ROOT / "style.css")
 
 # 本番公開URL（OGPの絶対URL生成に使用）。ogp.png / logo.png / favicon.png はリポジトリルート直下。
 # ogp.png = SNSシェア用（1200x630）、logo.png = ヘッダー表示用、favicon.png = タブアイコン。
-SITE_BASE_URL = "https://thinktank.pmi.or.jp/"
-DEFAULT_DESCRIPTION = "PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。"
+SITE_BASE_URL = SITE["base_url"]
+DEFAULT_DESCRIPTION = SITE["description"]
 
 # 生成物であることを明示するバナー。生成HTMLを直接編集してもビルド時に
 # 上書きされてしまうため、編集すべき元ファイルの場所をここで案内する。
@@ -43,13 +77,15 @@ GENERATED_BANNER = """<!--
   このファイルは build.py が自動生成しています。直接編集しないでください。
   （編集してもビルド時に上書きされ、公開サイトには反映されません）
 
-  編集する場所:
-    ・トップ/私たちについて/メンバー/プロジェクト/お問い合わせ
-        → partials/*.body.html
+  編集する場所（すべて Markdown です）:
+    ・トップ/私たちについて/プロジェクト/お問い合わせ
+        → content/index.md, about.md, projects.md, contact.md
+    ・メンバー（1人1ファイル。ファイル名がURLになります）
+        → content/members/*.md
+    ・サイト名・メニュー名・フッターのリンクなど
+        → content/site.md
     ・ブログ記事
         → blog/posts/*.md
-    ・共通のヘッダー/フッター/メタタグ
-        → blog/build.py
 
   反映方法: python blog/build.py を実行してコミット
            （main にマージすると GitHub Actions が自動ビルドします）
@@ -61,10 +97,8 @@ FONT_LINKS = """  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />"""
 
-# 一覧上部のカテゴリナビ（表示順）
-CATEGORIES = [
-    "All", "調査レポート", "論考", "解説", "プレスリリース",
-]
+# 一覧上部のカテゴリナビ（表示順）。content/site.md の blog_categories で変える。
+CATEGORIES = SITE["blog_categories"]
 
 # ---- 共通パーツ -------------------------------------------------------------
 
@@ -116,7 +150,7 @@ def social_meta_head(prefix, title, canonical_path, description="", image_path="
   <link rel="canonical" href="{page_url}" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ja_JP" />
-  <meta property="og:site_name" content="PMI ThinkTank" />
+  <meta property="og:site_name" content="{html.escape(SITE["site_name"])}" />
   <meta property="og:title" content="{html.escape(title)}" />
   <meta property="og:description" content="{html.escape(desc)}" />
   <meta property="og:url" content="{page_url}" />
@@ -334,63 +368,30 @@ FILTER_JS = """  <script>
 
 # ---- トップレベルの各ページ（トップ/私たちについて/プロジェクト/お問い合わせ）----
 
-# ヘッダーナビ（全トップレベルページ共通）。key は clean URL のディレクトリ名。
-SITE_NAV = [
-    ("about", "私たちについて"),
-    ("projects", "プロジェクト"),
-    ("blog", "ブログ"),
-    ("contact", "お問い合わせ"),
-]
-
 def site_nav(active, prefix):
     """prefix はサイトルートまでの相対パス（ルート="" / サブページ="../"）。"""
     links = []
-    for key, label in SITE_NAV:
-        cls = ' class="is-active"' if key == active else ''
-        links.append(f'        <a href="{prefix}{key}/"{cls}>{html.escape(label)}</a>')
+    for item in SITE["nav"]:
+        cls = ' class="is-active"' if item["key"] == active else ''
+        links.append(f'        <a href="{prefix}{item["key"]}/"{cls}>'
+                     f'{html.escape(item["label"])}</a>')
     home = prefix if prefix else './'
     return ('  <nav class="nav">\n'
             '    <div class="nav__inner">\n'
-            f'      <a href="{home}" class="nav__logo"><img src="{prefix}logo.png" alt="PMI ThinkTank" /></a>\n'
+            f'      <a href="{home}" class="nav__logo">'
+            f'<img src="{prefix}logo.png" alt="{html.escape(SITE["site_name"])}" /></a>\n'
             '      <div class="nav__links">\n' + "\n".join(links) + "\n"
             '      </div>\n'
             '    </div>\n'
             '  </nav>')
 
-# 「私たちについて」クラスタ内のサブナビ（私たちについて/メンバー/お問い合わせ）
-ABOUT_SUBNAV = [
-    ("about", "私たちについて"),
-    ("members", "メンバー"),
-    ("contact", "お問い合わせ"),
-]
-
 def about_subnav(active, prefix):
     items = []
-    for key, label in ABOUT_SUBNAV:
-        cls = ' class="is-active"' if key == active else ''
-        items.append(f'        <a href="{prefix}{key}/"{cls}>{html.escape(label)}</a>')
+    for item in SITE["subnav"]:
+        cls = ' class="is-active"' if item["key"] == active else ''
+        items.append(f'        <a href="{prefix}{item["key"]}/"{cls}>'
+                     f'{html.escape(item["label"])}</a>')
     return '      <div class="subnav">\n' + "\n".join(items) + "\n      </div>"
-
-# メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
-# (氏名, 役職, 専門領域)。専門領域は任意で、空文字なら行ごと出力しない。
-# メンバー。name / role / slug は必須、それ以外は任意で、無ければその要素を出力しない。
-#   slug    : 個人ページのURL（/members/<slug>/）に使う。日本語だとURLが
-#             エンコードされて読めなくなるためローマ字で持つ。
-#   field   : 専門領域（Staff のみ。役職の直下に置く）
-#   photo   : 顔写真のパス（未指定なら姓の一文字を出す暫定表示）
-#   twitter : X/Twitter のユーザー名（@ は不要）。ある人だけアイコンを出す。
-#   bio     : 紹介文（段落の配列）。未設定なら個人ページは見出しのみになる。
-MEMBERS_LEADERSHIP = [
-    {"slug": "ishiyama", "name": "石山 アンジュ", "role": "Chair"},
-    {"slug": "tanaka", "name": "田中 佑典", "role": "Executive Director"},
-]
-MEMBERS_STAFF = [
-    {"slug": "ueno", "name": "上野 裕太郎", "role": "Head of Research",
-     "field": "社会学／社会とテクノロジー", "twitter": "yutaro_0518"},
-    {"slug": "kobayashi", "name": "小林 駿斗", "role": "Visiting Researcher",
-     "field": "ポスト・デジタル社会／テクノロジーと法"},
-]
-ALL_MEMBERS = MEMBERS_LEADERSHIP + MEMBERS_STAFF
 
 # Twitter のロゴ（鳥）
 TWITTER_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" '
@@ -401,6 +402,21 @@ TWITTER_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentCo
           '4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1'
           '-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 '
           '13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z"/></svg>')
+
+def load_members():
+    """content/members/*.md を読む。ファイル名がそのまま個人ページのURLになる。
+    group（leadership / staff）で分け、order の小さい順に並べる。"""
+    members = []
+    for path in sorted((CONTENT_DIR / "members").glob("*.md")):
+        meta, body = load_md(path)
+        meta = dict(meta or {})
+        meta["slug"] = path.stem
+        meta["bio_html"] = md_to_html(body)
+        members.append(meta)
+    members.sort(key=lambda m: (m.get("order", 999), m["slug"]))
+    leadership = [m for m in members if m.get("group") == "leadership"]
+    staff = [m for m in members if m.get("group") == "staff"]
+    return leadership, staff, members
 
 def member_cards(members, prefix="../"):
     cards = []
@@ -437,12 +453,14 @@ def member_cards(members, prefix="../"):
     return "\n".join(cards)
 
 def site_footer():
+    links = "\n".join(
+        f'        <a href="{html.escape(s["href"])}" target="_blank" rel="noopener">'
+        f'{html.escape(s["label"])}</a>'
+        for s in SITE["social"])
     return ('  <footer class="site-foot">\n'
             '    <div class="wrap site-foot__inner">\n'
-            '      <span>© 2026 PMI ThinkTank (Public Meets Innovation)</span>\n'
-            '      <div class="site-foot__social">\n'
-            '        <a href="https://x.com/PMI__official" target="_blank" rel="noopener">Twitter</a>\n'
-            '        <a href="https://note.com/pmi_thinktank" target="_blank" rel="noopener">note</a>\n'
+            f'      <span>{html.escape(SITE["copyright"])}</span>\n'
+            '      <div class="site-foot__social">\n' + links + '\n'
             '      </div>\n'
             '    </div>\n'
             '  </footer>')
@@ -487,43 +505,156 @@ def home_cards(posts, n=3):
       </article>""")
     return "\n".join(cards)
 
-def render_toplevel(posts, n=3):
-    partials = SITE_ROOT / "partials"
-    # (partial, out_path, active_key, prefix, canonical_path, title, description)
+def section_open(sec):
+    """セクションの外枠と見出し（eyebrow / heading）。"""
+    cls = "section section--alt" if sec.get("alt") else "section"
+    sid = f' id="{html.escape(sec["id"])}"' if sec.get("id") else ""
+    head = ""
+    if sec.get("eyebrow") or sec.get("heading"):
+        head = ('      <div class="section__head">\n'
+                + (f'        <div class="section__eyebrow">{html.escape(sec["eyebrow"])}</div>\n'
+                   if sec.get("eyebrow") else "")
+                + (f'        <h2 class="section__title">{html.escape(sec["heading"])}</h2>\n'
+                   if sec.get("heading") else "")
+                + '      </div>\n')
+    return f'  <section class="{cls}"{sid}>\n    <div class="wrap">\n' + head
+
+def render_index_page(page, posts):
+    hero, latest = page["hero"], page["latest"]
+    cards = home_cards(posts, latest.get("count", 3))
+    return f"""  <header class="hero">
+    <div class="wrap">
+      <h1>{clause_spans(hero["heading"])}</h1>
+      <p>{clause_spans(hero["body"])}</p>
+      <a href="{html.escape(hero["cta_href"])}" class="hero__cta">{html.escape(hero["cta_label"])}</a>
+    </div>
+  </header>
+
+  <section class="section" id="blog">
+    <div class="wrap">
+      <div class="section__head">
+        <div class="section__eyebrow">{html.escape(latest["eyebrow"])}</div>
+        <h2 class="section__title">{html.escape(latest["heading"])}</h2>
+      </div>
+      <div class="home-cards">
+{cards}
+      </div>
+      <a href="blog/" class="more-link">{html.escape(latest["more_label"])}</a>
+    </div>
+  </section>"""
+
+def render_about_page(page, prefix):
+    out = []
+    for i, sec in enumerate(page["sections"]):
+        s = section_open(sec)
+        # サブナビは最初のセクションの見出し直後に置く
+        if i == 0:
+            s += about_subnav("about", prefix) + "\n"
+        if sec.get("lead"):
+            s += f'      <p class="about__lead">{inline_md(sec["lead"])}</p>\n'
+        if sec.get("cards"):
+            s += '      <div class="about__grid">\n'
+            for c in sec["cards"]:
+                s += ('        <div class="about__item">\n'
+                      f'          <h3>{html.escape(c["heading"])}</h3>\n'
+                      f'          <p>{inline_md(c["body"])}</p>\n'
+                      '        </div>\n')
+            s += '      </div>\n'
+        if sec.get("body"):
+            s += f'      <div class="message__body">\n{md_to_html(sec["body"])}\n      </div>\n'
+        if sec.get("sign"):
+            s += ('      <div class="message__sign">\n'
+                  f'        <div class="role">{html.escape(sec["sign"]["role"])}</div>\n'
+                  f'        <div class="name">{html.escape(sec["sign"]["name"])}</div>\n'
+                  '      </div>\n')
+        out.append(s + '    </div>\n  </section>')
+    return "\n\n".join(out)
+
+def render_projects_page(page):
+    items = []
+    for p in page["projects"]:
+        s = ('        <article class="project">\n'
+             f'          <div class="project__eyebrow">{html.escape(p["eyebrow"])}</div>\n'
+             f'          <h3 class="project__name">{html.escape(p["name"])}</h3>\n'
+             f'          <p class="project__desc">{inline_md(p["body"])}</p>\n')
+        if p.get("bullets"):
+            s += '          <ul>\n'
+            s += "".join(f'            <li>{inline_md(b)}</li>\n' for b in p["bullets"])
+            s += '          </ul>\n'
+        if p.get("note"):
+            s += f'          <p class="project__note">{inline_md(p["note"])}</p>\n'
+        if p.get("link_label"):
+            ext = ' target="_blank" rel="noopener"' if p.get("link_external") else ""
+            s += (f'          <a href="{html.escape(p["link_href"])}"{ext} '
+                  f'class="project__link">{html.escape(p["link_label"])}</a>\n')
+        items.append(s + '        </article>')
+    return (section_open({"id": "projects", "eyebrow": page["eyebrow"],
+                          "heading": page["heading"]})
+            + f'      <p class="about__lead">{inline_md(page["lead"])}</p>\n\n'
+            + '      <div class="projects">\n\n'
+            + "\n\n".join(items)
+            + '\n\n      </div>\n    </div>\n  </section>')
+
+def render_simple_page(page, body_md, active, prefix):
+    s = section_open({"id": active, "eyebrow": page.get("eyebrow"),
+                      "heading": page.get("heading")})
+    s += about_subnav(active, prefix) + "\n"
+    body = md_to_html(body_md)
+    if body:
+        s += f'      <div class="message__body">\n{body}\n      </div>\n'
+    return s + '    </div>\n  </section>'
+
+def render_members_page(page, leadership, staff, prefix):
+    s = section_open({"id": "members", "eyebrow": page.get("eyebrow", "Members"),
+                      "heading": page.get("heading", "メンバー")})
+    s += about_subnav("members", prefix) + "\n\n"
+    for label, group in (("Leadership", leadership), ("Staff", staff)):
+        if not group:
+            continue
+        s += (f'      <h3 class="members__group">{html.escape(label)}</h3>\n'
+              '      <div class="members-grid">\n'
+              + member_cards(group, prefix) + '\n      </div>\n\n')
+    return s + '    </div>\n  </section>'
+
+def render_toplevel(posts, leadership, staff):
+    prefix = "../"
+    index_page, _ = load_md(CONTENT_DIR / "index.md")
+    about_page, _ = load_md(CONTENT_DIR / "about.md")
+    projects_page, _ = load_md(CONTENT_DIR / "projects.md")
+    contact_page, contact_body = load_md(CONTENT_DIR / "contact.md")
+    members_page, _ = load_md(CONTENT_DIR / "members.md") \
+        if (CONTENT_DIR / "members.md").exists() else ({}, "")
+
+    site_name = SITE["site_name"]
     pages = [
-        ("index.body.html", "index.html", "index", "", "",
-         "PMI ThinkTank", DEFAULT_DESCRIPTION),
-        ("about.body.html", "about/index.html", "about", "../", "about/",
-         "私たちについて | PMI ThinkTank", ""),
-        ("members.body.html", "members/index.html", "members", "../", "members/",
-         "メンバー | PMI ThinkTank", ""),
-        ("projects.body.html", "projects/index.html", "projects", "../", "projects/",
-         "プロジェクト | PMI ThinkTank", ""),
-        ("contact.body.html", "contact/index.html", "contact", "../", "contact/",
-         "お問い合わせ | PMI ThinkTank", ""),
+        ("index.html", "index", "", "",
+         index_page.get("title", site_name), DEFAULT_DESCRIPTION,
+         render_index_page(index_page, posts)),
+        ("about/index.html", "about", prefix, "about/",
+         f'{about_page["title"]} | {site_name}', "",
+         render_about_page(about_page, prefix)),
+        ("members/index.html", "members", prefix, "members/",
+         f'{members_page.get("title", "メンバー")} | {site_name}', "",
+         render_members_page(members_page, leadership, staff, prefix)),
+        ("projects/index.html", "projects", prefix, "projects/",
+         f'{projects_page["title"]} | {site_name}', "",
+         render_projects_page(projects_page)),
+        ("contact/index.html", "contact", prefix, "contact/",
+         f'{contact_page["title"]} | {site_name}', "",
+         render_simple_page(contact_page, contact_body, "contact", prefix)),
     ]
-    # サブナビを持つページ（私たちについてクラスタ）
-    subnav_pages = {"about", "members", "contact"}
-    for partial, out, active, prefix, canonical, title, desc in pages:
-        body = (partials / partial).read_text(encoding="utf-8")
-        if active == "index":
-            body = body.replace("<!--LATEST_POSTS-->", home_cards(posts, n))
-        if active in subnav_pages:
-            body = body.replace("<!--SUBNAV-->", about_subnav(active, prefix))
-        if active == "members":
-            body = body.replace("<!--LEADERSHIP-->", member_cards(MEMBERS_LEADERSHIP))
-            body = body.replace("<!--STAFF-->", member_cards(MEMBERS_STAFF))
+    for out, active, pfx, canonical, title, desc, body in pages:
         out_path = SITE_ROOT / out
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(
-            site_shell(title, active, body, prefix, canonical, desc), encoding="utf-8")
-    print(f"  トップレベル生成: / /about/ /members/ /projects/ /contact/（最新{min(n, len(posts))}件掲載）")
+            site_shell(title, active, body, pfx, canonical, desc), encoding="utf-8")
+    print("  トップレベル生成: / /about/ /members/ /projects/ /contact/")
 
-def render_member_pages():
-    """メンバー個人ページ（/members/<slug>/）。紹介文が未設定のうちは
-    氏名・役職・専門領域だけの器として出力しておく。"""
+def render_member_pages(members):
+    """メンバー個人ページ（/members/<slug>/）。本文は content/members/*.md の
+    frontmatter より下に書いた Markdown がそのまま入る。"""
     prefix = "../../"     # /members/<slug>/ からサイトルートまで
-    for m in ALL_MEMBERS:
+    for m in members:
         photo = m.get("photo", "")
         media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
                  if photo else html.escape(m["name"].strip()[0]))
@@ -534,9 +665,6 @@ def render_member_pages():
             twitter = (f'\n          <a class="member-detail__twitter" '
                        f'href="https://x.com/{html.escape(m["twitter"])}" '
                        f'target="_blank" rel="noopener">{TWITTER_ICON}<span>@{html.escape(m["twitter"])}</span></a>')
-        # bio は段落の配列。未設定なら本文は空のまま。
-        bio_html = "\n".join(
-            f'        <p>{html.escape(p)}</p>' for p in m.get("bio", []))
         body = f"""  <section class="section" id="member-detail">
     <div class="wrap">
       <a href="{prefix}members/" class="member-detail__back">← メンバー一覧へ戻る</a>
@@ -548,17 +676,17 @@ def render_member_pages():
         </div>
       </div>
       <div class="member-detail__bio">
-{bio_html}
+{m["bio_html"]}
       </div>
     </div>
   </section>"""
         out_path = SITE_ROOT / "members" / m["slug"] / "index.html"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(
-            site_shell(f'{m["name"]} | PMI ThinkTank', "members", body,
+            site_shell(f'{m["name"]} | {SITE["site_name"]}', "members", body,
                        prefix, f'members/{m["slug"]}/'),
             encoding="utf-8")
-    print(f"  メンバー個人ページ生成: {len(ALL_MEMBERS)}名分")
+    print(f"  メンバー個人ページ生成: {len(members)}名分")
 
 # ---- main -------------------------------------------------------------------
 
@@ -574,8 +702,9 @@ def main():
         name = render_article(p)
         print(f"  記事生成: {name}")
     render_index(posts)
-    render_toplevel(posts)
-    render_member_pages()
+    leadership, staff, all_members = load_members()
+    render_toplevel(posts, leadership, staff)
+    render_member_pages(all_members)
     print(f"\n✅ 完了: {len(posts)}件の記事 + ブログ一覧 + トップレベル4ページを生成しました。")
 
 if __name__ == "__main__":
