@@ -373,33 +373,63 @@ def about_subnav(active, prefix):
 
 # メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
 # (氏名, 役職, 専門領域)。専門領域は任意で、空文字なら行ごと出力しない。
+# メンバー。name / role は必須、それ以外は任意で、無ければその要素を出力しない。
+#   field   : 専門領域（Staff のみ。役職の直下に置く）
+#   photo   : 顔写真のパス（未指定なら姓の一文字を出す暫定表示）
+#   twitter : X/Twitter のユーザー名（@ は不要）。ある人だけアイコンを出す。
+#   bio     : 紹介文。あれば「View Bio」で個人ページへ誘導する。
 MEMBERS_LEADERSHIP = [
-    ("石山 アンジュ", "Chair", ""),
-    ("田中 佑典", "Executive Director", ""),
+    {"name": "石山 アンジュ", "role": "Chair"},
+    {"name": "田中 佑典", "role": "Executive Director"},
 ]
 MEMBERS_STAFF = [
-    ("上野 裕太郎", "Head of Research", "社会学／社会とテクノロジー"),
-    ("小林 駿斗", "Visiting Researcher", "ポスト・デジタル社会／テクノロジーと法"),
+    {"name": "上野 裕太郎", "role": "Head of Research",
+     "field": "社会学／社会とテクノロジー"},
+    {"name": "小林 駿斗", "role": "Visiting Researcher",
+     "field": "ポスト・デジタル社会／テクノロジーと法"},
 ]
 
-def member_cards(members):
+# X（旧Twitter）のロゴ
+X_ICON = ('<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" '
+          'aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17'
+          'l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 '
+          '17.52h1.833L7.084 4.126H5.117z"/></svg>')
+
+def member_slug(name):
+    """個人ページのURLに使う識別子。ローマ字が未設定なら姓のローマ字化はせず、
+    メンバー定義の slug を使う。"""
+    return name.replace(" ", "").replace("　", "")
+
+def member_cards(members, prefix="../"):
     cards = []
-    for name, role, field in members:
-        initial = name.strip()[0]
-        field_html = ""
-        if field:
-            # 「／」区切りの各領域を inline-block で包み、折り返しが区切り位置で
-            # 起きるようにする（「テクノロ／ジーと法」のような語中での分断を防ぐ）。
-            segs = field.split("／")
-            inner = "".join(
-                f'<span>{html.escape(s)}{"／" if i < len(segs) - 1 else ""}</span>'
-                for i, s in enumerate(segs))
-            field_html = f'\n            <div class="member-card__field">{inner}</div>'
+    for m in members:
+        name, role = m["name"], m["role"]
+        field, photo = m.get("field", ""), m.get("photo", "")
+        twitter, bio = m.get("twitter", ""), m.get("bio", "")
+
+        media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
+                 if photo else html.escape(name.strip()[0]))
+        field_html = (f'\n            <div class="member-card__field">{html.escape(field)}</div>'
+                      if field else "")
+
+        actions = []
+        if twitter:
+            actions.append(
+                f'<a class="member-card__icon" href="https://x.com/{html.escape(twitter)}" '
+                f'target="_blank" rel="noopener" '
+                f'aria-label="{html.escape(name)}のX（旧Twitter）">{X_ICON}</a>')
+        if bio:
+            actions.append(
+                f'<a class="member-card__bio" href="{prefix}members/'
+                f'{html.escape(m.get("slug", member_slug(name)))}/">View Bio</a>')
+        actions_html = ('\n            <div class="member-card__actions">'
+                        + "".join(actions) + '</div>') if actions else ""
+
         cards.append(f"""        <div class="member-card">
-          <div class="member-card__avatar" aria-hidden="true">{html.escape(initial)}</div>
+          <div class="member-card__photo" aria-hidden="true">{media}</div>
           <div class="member-card__body">
             <div class="member-card__name">{html.escape(name)}</div>
-            <div class="member-card__role">{html.escape(role)}</div>{field_html}
+            <div class="member-card__role">{html.escape(role)}</div>{field_html}{actions_html}
           </div>
         </div>""")
     return "\n".join(cards)
