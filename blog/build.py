@@ -373,21 +373,24 @@ def about_subnav(active, prefix):
 
 # メンバー一覧（写真は未着手のためイニシャルのプレースホルダー表示）
 # (氏名, 役職, 専門領域)。専門領域は任意で、空文字なら行ごと出力しない。
-# メンバー。name / role は必須、それ以外は任意で、無ければその要素を出力しない。
+# メンバー。name / role / slug は必須、それ以外は任意で、無ければその要素を出力しない。
+#   slug    : 個人ページのURL（/members/<slug>/）に使う。日本語だとURLが
+#             エンコードされて読めなくなるためローマ字で持つ。
 #   field   : 専門領域（Staff のみ。役職の直下に置く）
 #   photo   : 顔写真のパス（未指定なら姓の一文字を出す暫定表示）
 #   twitter : X/Twitter のユーザー名（@ は不要）。ある人だけアイコンを出す。
-#   bio     : 紹介文。あれば「View Bio」で個人ページへ誘導する。
+#   bio     : 紹介文（段落の配列）。未設定なら個人ページは見出しのみになる。
 MEMBERS_LEADERSHIP = [
-    {"name": "石山 アンジュ", "role": "Chair"},
-    {"name": "田中 佑典", "role": "Executive Director"},
+    {"slug": "ishiyama", "name": "石山 アンジュ", "role": "Chair"},
+    {"slug": "tanaka", "name": "田中 佑典", "role": "Executive Director"},
 ]
 MEMBERS_STAFF = [
-    {"name": "上野 裕太郎", "role": "Head of Research",
+    {"slug": "ueno", "name": "上野 裕太郎", "role": "Head of Research",
      "field": "社会学／社会とテクノロジー"},
-    {"name": "小林 駿斗", "role": "Visiting Researcher",
+    {"slug": "kobayashi", "name": "小林 駿斗", "role": "Visiting Researcher",
      "field": "ポスト・デジタル社会／テクノロジーと法"},
 ]
+ALL_MEMBERS = MEMBERS_LEADERSHIP + MEMBERS_STAFF
 
 # X（旧Twitter）のロゴ
 X_ICON = ('<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" '
@@ -395,17 +398,12 @@ X_ICON = ('<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" '
           'l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 '
           '17.52h1.833L7.084 4.126H5.117z"/></svg>')
 
-def member_slug(name):
-    """個人ページのURLに使う識別子。ローマ字が未設定なら姓のローマ字化はせず、
-    メンバー定義の slug を使う。"""
-    return name.replace(" ", "").replace("　", "")
-
 def member_cards(members, prefix="../"):
     cards = []
     for m in members:
         name, role = m["name"], m["role"]
         field, photo = m.get("field", ""), m.get("photo", "")
-        twitter, bio = m.get("twitter", ""), m.get("bio", "")
+        twitter = m.get("twitter", "")
 
         media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
                  if photo else html.escape(name.strip()[0]))
@@ -418,10 +416,10 @@ def member_cards(members, prefix="../"):
                 f'<a class="member-card__icon" href="https://x.com/{html.escape(twitter)}" '
                 f'target="_blank" rel="noopener" '
                 f'aria-label="{html.escape(name)}のX（旧Twitter）">{X_ICON}</a>')
-        if bio:
-            actions.append(
-                f'<a class="member-card__bio" href="{prefix}members/'
-                f'{html.escape(m.get("slug", member_slug(name)))}/">View Bio</a>')
+        # 個人ページは全員分を生成しているので View Bio は常に出す
+        actions.append(
+            f'<a class="member-card__bio" href="{prefix}members/'
+            f'{html.escape(m["slug"])}/">View Bio</a>')
         actions_html = ('\n            <div class="member-card__actions">'
                         + "".join(actions) + '</div>') if actions else ""
 
@@ -517,6 +515,47 @@ def render_toplevel(posts, n=3):
             site_shell(title, active, body, prefix, canonical, desc), encoding="utf-8")
     print(f"  トップレベル生成: / /about/ /members/ /projects/ /contact/（最新{min(n, len(posts))}件掲載）")
 
+def render_member_pages():
+    """メンバー個人ページ（/members/<slug>/）。紹介文が未設定のうちは
+    氏名・役職・専門領域だけの器として出力しておく。"""
+    prefix = "../../"     # /members/<slug>/ からサイトルートまで
+    for m in ALL_MEMBERS:
+        photo = m.get("photo", "")
+        media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
+                 if photo else html.escape(m["name"].strip()[0]))
+        field = (f'\n          <div class="member-detail__field">{html.escape(m["field"])}</div>'
+                 if m.get("field") else "")
+        twitter = ""
+        if m.get("twitter"):
+            twitter = (f'\n          <a class="member-detail__x" '
+                       f'href="https://x.com/{html.escape(m["twitter"])}" '
+                       f'target="_blank" rel="noopener">{X_ICON}<span>@{html.escape(m["twitter"])}</span></a>')
+        # bio は段落の配列。未設定なら本文は空のまま。
+        bio_html = "\n".join(
+            f'        <p>{html.escape(p)}</p>' for p in m.get("bio", []))
+        body = f"""  <section class="section" id="member-detail">
+    <div class="wrap">
+      <a href="{prefix}members/" class="member-detail__back">← メンバー一覧へ戻る</a>
+      <div class="member-detail__head">
+        <div class="member-detail__photo" aria-hidden="true">{media}</div>
+        <div>
+          <h1 class="member-detail__name">{html.escape(m["name"])}</h1>
+          <div class="member-detail__role">{html.escape(m["role"])}</div>{field}{twitter}
+        </div>
+      </div>
+      <div class="member-detail__bio">
+{bio_html}
+      </div>
+    </div>
+  </section>"""
+        out_path = SITE_ROOT / "members" / m["slug"] / "index.html"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(
+            site_shell(f'{m["name"]} | PMI ThinkTank', "members", body,
+                       prefix, f'members/{m["slug"]}/'),
+            encoding="utf-8")
+    print(f"  メンバー個人ページ生成: {len(ALL_MEMBERS)}名分")
+
 # ---- main -------------------------------------------------------------------
 
 def main():
@@ -532,6 +571,7 @@ def main():
         print(f"  記事生成: {name}")
     render_index(posts)
     render_toplevel(posts)
+    render_member_pages()
     print(f"\n✅ 完了: {len(posts)}件の記事 + ブログ一覧 + トップレベル4ページを生成しました。")
 
 if __name__ == "__main__":
