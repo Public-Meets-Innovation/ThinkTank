@@ -253,10 +253,6 @@ img { max-width: 100%; height: auto; }
 .subnav a.is-active { color: var(--text); font-weight: 700; border-bottom: 2px solid var(--accent); }
 
 /* ===== Members ===== */
-/* カードを3列で並べるページなので、他ページ（1080px）より横幅を広く取る。
-   1080px のままだとカード1枚が約328pxで、写真と内側余白を引いた文字領域が
-   182pxしかなく、専門領域が語中で折り返してしまう。 */
-#members .wrap { max-width: 1280px; }
 .members__group {
   font-size: 26px;
   font-weight: 700;
@@ -305,6 +301,10 @@ img { max-width: 100%; height: auto; }
   color: var(--text-muted);
   line-height: 1.6;
   margin-top: 4px;
+  /* 3列だと1行に収まらないことがある。折り返す場合も語中では切らず、
+     文節の切れ目で折り返す（「テクノロ／ジー」のような分断を防ぐ）。 */
+  word-break: auto-phrase;
+  line-break: strict;
 }
 /* Xアイコンと View Bio はカード下部の右寄せ */
 .member-card__actions {
@@ -335,6 +335,47 @@ img { max-width: 100%; height: auto; }
   transition: background-color 0.15s, border-color 0.15s;
 }
 .member-card__bio:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* ===== Member detail（/members/<slug>/） ===== */
+.member-detail__back { font-size: 14px; color: var(--text-muted); }
+.member-detail__back:hover { color: var(--text); }
+.member-detail__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  margin-top: 28px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+.member-detail__photo {
+  flex: none;
+  width: 148px;
+  height: 148px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.member-detail__photo img { width: 100%; height: 100%; object-fit: cover; }
+.member-detail__name { font-size: 30px; font-weight: 700; line-height: 1.35; }
+.member-detail__role { font-size: 16px; color: var(--text-muted); margin-top: 6px; }
+.member-detail__field { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+.member-detail__x {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.member-detail__x:hover { color: var(--text); }
+.member-detail__bio { margin-top: 32px; max-width: 720px; }
+.member-detail__bio p { font-size: 16px; color: #333; margin-bottom: 18px; }
 
 /* ===== Projects ===== */
 /* 見出し・リード文・カードの「外枠」をすべて同じ位置に揃える（テキスト同士ではなく箱同士）。
