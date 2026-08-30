@@ -163,13 +163,16 @@ def social_meta_head(prefix, title, canonical_path, description="", image_path="
   <meta name="twitter:image" content="{image_url}" />
   <meta name="twitter:image:alt" content="{html.escape(title)}" />"""
 
-def header_html():
-    return """  <header class="site-header">
+def header_html(root_prefix, blog_prefix):
+    """root_prefix: サイトルートまでの相対パス。blog_prefix: blog/ までの相対パス。
+    一覧は blog/ 直下、記事は blog/<slug>/ と深さが違うため両方を受け取る。"""
+    blog_home = blog_prefix or "./"
+    return f"""  <header class="site-header">
     <div class="site-header__inner">
       <div class="site-header__left">
-        <a href="../" class="site-home">← PMI ThinkTank</a>
-        <a href="index.html" class="logo">
-          <img src="../logo.png" alt="PMI ThinkTank" />
+        <a href="{root_prefix}" class="site-home">← {html.escape(SITE["site_name"])}</a>
+        <a href="{blog_home}" class="logo">
+          <img src="{root_prefix}logo.png" alt="{html.escape(SITE["site_name"])}" />
         </a>
       </div>
       <button class="theme-toggle" type="button" role="switch" aria-label="ライト/ダーク切り替え"><span class="tt-opt" data-mode="L">L</span><span class="tt-opt" data-mode="D">D</span></button>
@@ -177,15 +180,18 @@ def header_html():
   </header>"""
 
 def footer_html():
-    return """  <footer class="site-footer">
-    <div class="site-footer__inner">
-      <span>© 2026 PMI ThinkTank</span>
-      <div class="social">
-        <a href="https://x.com/PMI__official" target="_blank" rel="noopener">Twitter</a>
-        <a href="https://note.com/pmi_thinktank" target="_blank" rel="noopener">note</a>
-      </div>
-    </div>
-  </footer>"""
+    # フッターの文言・リンクは content/site.md から。トップ側と二重管理しない。
+    links = "\n".join(
+        f'        <a href="{html.escape(s["href"])}" target="_blank" rel="noopener">'
+        f'{html.escape(s["label"])}</a>'
+        for s in SITE["social"])
+    return ('  <footer class="site-footer">\n'
+            '    <div class="site-footer__inner">\n'
+            f'      <span>{html.escape(SITE["copyright"])}</span>\n'
+            '      <div class="social">\n' + links + '\n'
+            '      </div>\n'
+            '    </div>\n'
+            '  </footer>')
 
 # テーマ（ライト/ダーク）の適用スクリプト
 THEME_HEAD_JS = """  <script>
@@ -224,9 +230,12 @@ def nav_html():
             f'    <a href="#"{cls} data-cat="{cat_val}">{html.escape(c)}</a>')
     return '  <nav class="category-nav">\n' + "\n".join(items) + "\n  </nav>"
 
-def page(title, body, canonical_path="blog/", description="", image_path="ogp.png"):
-    # ブログページはすべて blog/ 直下（記事も一覧も）なのでサイトルートまでは常に "../"
-    social = social_meta_head("../", title, canonical_path, description, image_path)
+def page(title, body, canonical_path="blog/", description="", image_path="ogp.png",
+         blog_prefix=""):
+    """blog_prefix は blog/ ディレクトリまでの相対パス。
+    一覧（blog/index.html）は ""、記事（blog/<slug>/index.html）は "../"。"""
+    root_prefix = "../" + blog_prefix
+    social = social_meta_head(root_prefix, title, canonical_path, description, image_path)
     return f"""<!DOCTYPE html>
 {GENERATED_BANNER}
 <html lang="ja">
@@ -237,10 +246,10 @@ def page(title, body, canonical_path="blog/", description="", image_path="ogp.pn
 {social}
 {FONT_LINKS}
 {THEME_HEAD_JS}
-  <link rel="stylesheet" href="style.css?v={BLOG_CSS_VER}" />
+  <link rel="stylesheet" href="{blog_prefix}style.css?v={BLOG_CSS_VER}" />
 </head>
 <body>
-{header_html()}
+{header_html(root_prefix, blog_prefix)}
 {body}
 {footer_html()}
 {THEME_TOGGLE_JS}
@@ -287,32 +296,60 @@ def date_ja(iso):
 # ---- 記事ページ生成 ---------------------------------------------------------
 
 def render_article(p):
+    # 記事は blog/<slug>/index.html に置き、URLから .html を無くす。
+    # blog/ 直下より1段深くなるので、本文中の images/... も1段ぶん持ち上げる。
+    blog_prefix = "../"
+    body_html = re.sub(r'(src|href)="images/', rf'\1="{blog_prefix}images/',
+                       p["body_html"])
     # 記事上部のヒーロー画像は本文先頭画像（＝サムネイル）と重複するため出力しない。
     # thumbnail は一覧カードのサムネイルとしてのみ使用する。
     body = f"""  <article class="article">
-    <a href="index.html" class="article__back">← ブログ一覧へ戻る</a>
+    <a href="{blog_prefix}" class="article__back">← ブログ一覧へ戻る</a>
     <h1 class="article__title">{html.escape(p["title"])}</h1>
     <div class="article__meta">{html.escape(p["category"])} ・ {date_ja(p["date"])}</div>
     <div class="article__body">
-{p["body_html"]}
+{body_html}
     </div>
   </article>"""
     # OGP画像は記事のサムネイルを優先。無ければ共通ロゴにフォールバック。
     image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "ogp.png"
-    out = ROOT / f'{p["slug"]}.html'
+    out = ROOT / p["slug"] / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
-        page(f'{p["title"]} | PMI ThinkTank Blog', body,
-             canonical_path=f'blog/{p["slug"]}.html', description=p["excerpt"],
-             image_path=image_path),
+        page(f'{p["title"]} | {SITE["site_name"]} Blog', body,
+             canonical_path=f'blog/{p["slug"]}/', description=p["excerpt"],
+             image_path=image_path, blog_prefix=blog_prefix),
         encoding="utf-8")
-    return out.name
+    return f'{p["slug"]}/'
 
 # ---- 一覧ページ生成 ---------------------------------------------------------
+
+def render_legacy_redirects(posts):
+    """記事URLを blog/<slug>.html から blog/<slug>/ に変えたため、
+    旧URLが 404 にならないよう転送用のページを残す。GitHub Pages には
+    サーバー側のリダイレクト設定が無いので、meta refresh + canonical で行う。
+    旧URLが参照されなくなったら、この関数ごと消してよい。"""
+    for p in posts:
+        target = f'{p["slug"]}/'
+        (ROOT / f'{p["slug"]}.html').write_text(
+            f"""<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="refresh" content="0; url={target}" />
+<link rel="canonical" href="{SITE_BASE_URL}blog/{target}" />
+<meta name="robots" content="noindex" />
+<title>移動しました</title>
+</head>
+<body><p><a href="{target}">このページは移動しました</a></p></body>
+</html>
+""", encoding="utf-8")
+    print(f"  旧URLからの転送ページ: {len(posts)}件")
 
 def render_index(posts):
     cards = []
     for p in posts:
-        link = f'{p["slug"]}.html'
+        link = f'{p["slug"]}/'
         thumb = ""
         if p["thumbnail"]:
             thumb = (f'      <a href="{link}" class="post__thumb">'
@@ -491,7 +528,7 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
 def home_cards(posts, n=3):
     cards = []
     for p in posts[:n]:
-        link = f'blog/{p["slug"]}.html'
+        link = f'blog/{p["slug"]}/'
         thumb = ""
         if p["thumbnail"]:
             thumb = (f'<a href="{link}" class="home-card__thumb">'
@@ -701,6 +738,7 @@ def main():
     for p in posts:
         name = render_article(p)
         print(f"  記事生成: {name}")
+    render_legacy_redirects(posts)
     render_index(posts)
     leadership, staff, all_members = load_members()
     render_toplevel(posts, leadership, staff)
