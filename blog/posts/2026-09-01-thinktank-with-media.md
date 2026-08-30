@@ -7,8 +7,6 @@ thumbnail: images/20260901_positionpaper/20260901_positionpaper.png
 OG image: images/20260901_positionpaper/20260901_positionpaper.png
 Twitter image: images/20260901_positionpaper/20260901_positionpaper.png
 ---
-# ThinkTank with Media―ナラティブの時代に、シンクタンクは何を担うのか―
-
 ## はじめに
 本稿は、PMI ThinkTankが自らの位置と機能を再定義するために書かれたポジションペーパーである。組織の自己定義とは、本来、外部環境の変化に対する応答として行われる。したがって本稿では、一般社団法人Public Meets Innovation（以下、PMI）及び、PMI ThinkTankという一組織の来歴を語る前に、まずこの10数年のあいだに日本の社会運動と言論をめぐる環境がどのように変質したのかを記述することから始めたい。
 
