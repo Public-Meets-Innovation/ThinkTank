@@ -13,6 +13,7 @@ name: 石山 アンジュ
 role: Chair
 group: leadership
 order: 1
+website: https://anjuishiyama.world/
 twitter : Anjurian
 photo : assets/member/anju.png
 ---
