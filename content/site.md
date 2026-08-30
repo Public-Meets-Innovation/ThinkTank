@@ -5,6 +5,10 @@ base_url: https://thinktank.pmi.or.jp/
 description: PMI ThinkTank（Public Meets Innovation）— 事実とデータ、人文・社会科学の知に基づく政治・政策のシンクタンク。
 copyright: © 2026 PMI ThinkTank (Public Meets Innovation)
 
+# 記事に thumbnail を書かなかったときに使う画像（リポジトリ直下からのパス）。
+# 一覧カードのサムネイルと、SNSシェア時の画像の両方に使われます。
+default_thumbnail: ogp.png
+
 # ヘッダーのメニュー。key はページのフォルダ名なので変更しない。label だけ変えられる。
 nav:
   - key: about
