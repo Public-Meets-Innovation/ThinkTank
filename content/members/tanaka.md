@@ -4,4 +4,5 @@ name: 田中 佑典
 role: Executive Director
 group: leadership
 order: 2
+photo: assets/member/tanaka.png
 ---
