@@ -122,6 +122,8 @@ PMI ThinkTankは、この空白に対する応答として、自らを「ThinkTa
 
 参照点は、単独では成立しない。それを参照する他者が存在してはじめて、座標としての機能を持つ。本稿は、PMI ThinkTankの立場の表明であると同時に、この空白の存在を認識し、それぞれの位置からこれに応答しようとするすべての個人と組織に対する、対話の呼びかけである。
 
+[PDFをダウンロード開く](pdf/20260901_positionpaper/ナラティブ時代の「参照点」としてのPMI ThinkTankへ.pdf)
+
 ---
 
 発行　PMI ThinkTank（一般社団法人Public Meets Innovation）
