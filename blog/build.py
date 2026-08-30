@@ -451,6 +451,14 @@ TWITTER_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentCo
           '-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 '
           '13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z"/></svg>')
 
+# 個人サイト用のアイコン（地球儀）
+WEBSITE_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="none" '
+                'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+                'aria-hidden="true"><circle cx="12" cy="12" r="9"/>'
+                '<path d="M3 12h18"/>'
+                '<path d="M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9"/>'
+                '<path d="M12 3C9.5 5.7 8.2 8.7 8.2 12s1.3 6.3 3.8 9"/></svg>')
+
 def load_members():
     """content/members/*.md を読む。ファイル名がそのまま個人ページのURLになる。
     group（leadership / staff）で分け、order の小さい順に並べる。"""
@@ -471,7 +479,7 @@ def member_cards(members, prefix="../"):
     for m in members:
         name, role = m["name"], m["role"]
         field, photo = m.get("field", ""), m.get("photo", "")
-        twitter = m.get("twitter", "")
+        twitter, website = m.get("twitter", ""), m.get("website", "")
 
         media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
                  if photo else html.escape(name.strip()[0]))
@@ -484,6 +492,11 @@ def member_cards(members, prefix="../"):
                 f'<a class="member-card__icon" href="https://x.com/{html.escape(twitter)}" '
                 f'target="_blank" rel="noopener" '
                 f'aria-label="{html.escape(name)}のTwitter">{TWITTER_ICON}</a>')
+        if website:
+            actions.append(
+                f'<a class="member-card__icon" href="{html.escape(website)}" '
+                f'target="_blank" rel="noopener" '
+                f'aria-label="{html.escape(name)}の個人サイト">{WEBSITE_ICON}</a>')
         # 個人ページは全員分を生成しているので View Bio は常に出す
         actions.append(
             f'<a class="member-card__bio" href="{prefix}members/'
@@ -707,11 +720,23 @@ def render_member_pages(members):
                  if photo else html.escape(m["name"].strip()[0]))
         field = (f'\n          <div class="member-detail__field">{html.escape(m["field"])}</div>'
                  if m.get("field") else "")
-        twitter = ""
+        # Twitter と個人サイトのリンク。設定した人にだけ出る。
+        links = []
         if m.get("twitter"):
-            twitter = (f'\n          <a class="member-detail__twitter" '
-                       f'href="https://x.com/{html.escape(m["twitter"])}" '
-                       f'target="_blank" rel="noopener">{TWITTER_ICON}<span>@{html.escape(m["twitter"])}</span></a>')
+            links.append(
+                f'<a class="member-detail__link" '
+                f'href="https://x.com/{html.escape(m["twitter"])}" '
+                f'target="_blank" rel="noopener">{TWITTER_ICON}'
+                f'<span>@{html.escape(m["twitter"])}</span></a>')
+        if m.get("website"):
+            label = re.sub(r'^https?://', '', m["website"]).rstrip('/')
+            links.append(
+                f'<a class="member-detail__link" '
+                f'href="{html.escape(m["website"])}" '
+                f'target="_blank" rel="noopener">{WEBSITE_ICON}'
+                f'<span>{html.escape(label)}</span></a>')
+        twitter = ('\n          <div class="member-detail__links">'
+                   + "".join(links) + '</div>') if links else ""
         body = f"""  <section class="section" id="member-detail">
     <div class="wrap">
       <a href="{prefix}members/" class="member-detail__back">← メンバー一覧へ戻る</a>
@@ -733,6 +758,16 @@ def render_member_pages(members):
             site_shell(f'{m["name"]} | {SITE["site_name"]}', "members", body,
                        prefix, f'members/{m["slug"]}/'),
             encoding="utf-8")
+    # content/members/ から消した（またはファイル名を変えた）人のページが
+    # 古い内容のまま残らないよう、対応する .md が無いものを片付ける。
+    current = {m["slug"] for m in members}
+    for d in sorted((SITE_ROOT / "members").iterdir()):
+        if d.is_dir() and d.name not in current:
+            for f in d.rglob("*"):
+                if f.is_file():
+                    f.unlink()
+            d.rmdir()
+            print(f"  不要になったメンバーページを削除: members/{d.name}/")
     print(f"  メンバー個人ページ生成: {len(members)}名分")
 
 # ---- main -------------------------------------------------------------------

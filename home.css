@@ -375,16 +375,22 @@ img { max-width: 100%; height: auto; }
 .member-detail__name { font-size: 30px; font-weight: 700; line-height: 1.35; }
 .member-detail__role { font-size: 16px; color: var(--text-muted); margin-top: 6px; }
 .member-detail__field { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
-.member-detail__twitter {
+/* Twitter と個人サイトのリンク。設定した分だけ横に並ぶ。 */
+.member-detail__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 16px;
+}
+.member-detail__link {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-top: 16px;
   font-size: 14px;
   color: var(--text-muted);
   transition: color 0.15s;
 }
-.member-detail__twitter:hover { color: var(--text); }
+.member-detail__link:hover { color: var(--text); }
 .member-detail__bio { margin-top: 32px; max-width: 720px; }
 .member-detail__bio p { font-size: 16px; color: #333; margin-bottom: 18px; }
 
