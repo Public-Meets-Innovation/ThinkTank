@@ -100,6 +100,17 @@ FONT_LINKS = """  <link rel="preconnect" href="https://fonts.googleapis.com" />
 # 一覧上部のカテゴリナビ（表示順）。content/site.md の blog_categories で変える。
 CATEGORIES = SITE["blog_categories"]
 
+# 記事に thumbnail を書かなかったときの既定画像（サイトルートからのパス）。
+DEFAULT_THUMBNAIL = SITE.get("default_thumbnail", "ogp.png")
+
+def thumb_src(post, blog_prefix, root_prefix):
+    """カードに出すサムネイルのパス。
+    記事の thumbnail は blog/ を基準に書かれ、既定画像はサイトルート基準なので、
+    どちらを使うかで基準が変わる。呼び出し側のページ位置に合わせて解決する。"""
+    if post["thumbnail"]:
+        return blog_prefix + post["thumbnail"]
+    return root_prefix + DEFAULT_THUMBNAIL
+
 # ---- 共通パーツ -------------------------------------------------------------
 
 def image_size(path):
@@ -312,7 +323,7 @@ def render_article(p):
     </div>
   </article>"""
     # OGP画像は記事のサムネイルを優先。無ければ共通ロゴにフォールバック。
-    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else "ogp.png"
+    image_path = f'blog/{p["thumbnail"]}' if p["thumbnail"] else DEFAULT_THUMBNAIL
     out = ROOT / p["slug"] / "index.html"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
@@ -350,10 +361,9 @@ def render_index(posts):
     cards = []
     for p in posts:
         link = f'{p["slug"]}/'
-        thumb = ""
-        if p["thumbnail"]:
-            thumb = (f'      <a href="{link}" class="post__thumb">'
-                     f'<img src="{html.escape(p["thumbnail"])}" alt="" /></a>\n')
+        # 一覧は blog/ 直下。thumbnail 未指定なら既定画像（サイトルート基準）を使う。
+        thumb = (f'      <a href="{link}" class="post__thumb">'
+                 f'<img src="{html.escape(thumb_src(p, "", "../"))}" alt="" /></a>\n')
         excerpt = ""
         if p["excerpt"]:
             excerpt = f'      <p class="post__excerpt">{html.escape(p["excerpt"])}</p>\n'
@@ -529,10 +539,9 @@ def home_cards(posts, n=3):
     cards = []
     for p in posts[:n]:
         link = f'blog/{p["slug"]}/'
-        thumb = ""
-        if p["thumbnail"]:
-            thumb = (f'<a href="{link}" class="home-card__thumb">'
-                     f'<img src="blog/{html.escape(p["thumbnail"])}" alt="" /></a>')
+        # トップはサイトルート。thumbnail 未指定なら既定画像にフォールバックする。
+        thumb = (f'<a href="{link}" class="home-card__thumb">'
+                 f'<img src="{html.escape(thumb_src(p, "blog/", ""))}" alt="" /></a>')
         cards.append(f"""      <article class="home-card">
         {thumb}
         <div class="home-card__body">
