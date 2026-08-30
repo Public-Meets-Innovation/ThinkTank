@@ -6,5 +6,5 @@ group: staff
 order: 1
 field: 社会学／社会とテクノロジー
 twitter: yutaro_0518
-photo: assets/mamber/yutaro.png
+photo: assets/member/yutaro.png
 ---
