@@ -161,6 +161,13 @@ img {
   display: block;
 }
 
+/* ダークモードでは文字が白い反転版に差し替える。サイズ・位置は同じ。
+   両方を出力しておいて表示を切り替えるので、読み込み後に一瞬入れ替わることがない。
+   下の .logo img が display:block を持つため、打ち消せるよう同じ詳細度で書く。 */
+.logo img.logo__dark { display: none; }
+:root[data-theme="dark"] .logo img.logo__light { display: none; }
+:root[data-theme="dark"] .logo img.logo__dark { display: block; }
+
 .logo img {
   height: 44px;
   width: auto;

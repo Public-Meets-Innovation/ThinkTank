@@ -183,7 +183,8 @@ def header_html(root_prefix, blog_prefix):
       <div class="site-header__left">
         <a href="{root_prefix}" class="site-home">← {html.escape(SITE["site_name"])}</a>
         <a href="{blog_home}" class="logo">
-          <img src="{root_prefix}logo.png" alt="{html.escape(SITE["site_name"])}" />
+          <img class="logo__light" src="{root_prefix}logo.png" alt="{html.escape(SITE["site_name"])}" />
+          <img class="logo__dark" src="{root_prefix}logo-reverse.png" alt="{html.escape(SITE["site_name"])}" />
         </a>
       </div>
       <button class="theme-toggle" type="button" role="switch" aria-label="ライト/ダーク切り替え"><span class="tt-opt" data-mode="L">L</span><span class="tt-opt" data-mode="D">D</span></button>
