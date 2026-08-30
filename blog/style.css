@@ -253,11 +253,16 @@ img {
   font-weight: 700;
 }
 
+/* 一覧のサムネイル。列幅いっぱいだと1件で画面を占有してしまうので幅を抑え、
+   比率はトップのカードと同じ 16:9 に固定する。元画像の縦横比がまちまちでも
+   （1200x630 や 1920x1005 など）並びの高さが揃う。 */
 .post__thumb {
   display: block;
   width: 100%;
+  max-width: 400px;
+  aspect-ratio: 16 / 9;
   border-radius: 4px;
-  margin-top: 24px;
+  margin-top: 20px;
   overflow: hidden;
   border: 1px solid var(--line);
 }
@@ -266,7 +271,8 @@ img {
 .post__thumb svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 
 .post__excerpt {
