@@ -7,4 +7,5 @@ role: Visiting Researcher
 group: staff
 order: 2
 field: ポスト・デジタル社会／テクノロジーと法
+twitter: kobayashihaya
 ---
