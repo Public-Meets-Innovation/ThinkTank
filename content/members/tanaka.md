@@ -7,6 +7,6 @@ role: Executive Director
 group: leadership
 order: 2
 website: https://yusuketanaka-vernacular.netlify.app/
-Twitter: YusukeT1215
+twitter: YusukeT1215
 photo: assets/member/tanaka.png
 ---
