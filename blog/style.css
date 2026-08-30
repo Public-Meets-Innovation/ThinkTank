@@ -29,6 +29,8 @@
   --text-light: #b0b0b0;
   --line: #ececec;
   --accent: #1a5f7a;
+  /* 本文中のリンクなど、リンクとして読ませるテキストの色 */
+  --link: #3676f7;
   --bg: #ffffff;
   --card: #ffffff;
   --body-text: #333333;
@@ -43,6 +45,8 @@
   --text-light: #6a6a6a;
   --line: #2c2c2c;
   --accent: #5bb4d6;
+  /* 同じ青を暗い背景に置くとコントラストが落ちて沈むため、明るめに振る */
+  --link: #6f9dff;
   --bg: #14181b;
   --card: #1b2024;
   --body-text: #cfcfcf;
@@ -287,7 +291,7 @@ img {
   display: inline-block;
   margin-top: 18px;
   font-size: 15px;
-  color: var(--accent);
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -370,6 +374,15 @@ img {
   margin: 16px 0;
   font-size: 17px;
   color: var(--body-text);
+}
+
+/* 本文中のリンク。既定では a が color: inherit のため、本文と見分けが
+   つかない状態だった（note から取り込んだ記事は本文中の参照リンクが多い）。 */
+.article__body a {
+  color: var(--link);
+}
+.article__body a:hover {
+  text-decoration: underline;
 }
 
 .article__body ul {

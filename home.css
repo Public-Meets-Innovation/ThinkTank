@@ -35,6 +35,8 @@
      旧 --accent-dark（濃いティール）はネイビーに統合し、色数を増やさない。 */
   --navy: #0F2233;
   --accent: #1a5f7a;
+  /* 本文中のリンクなど、リンクとして読ませるテキストの色 */
+  --link: #3676f7;
   --accent-dark: var(--navy);
   --bg: #ffffff;
   --max: 1080px;
@@ -205,6 +207,19 @@ img { max-width: 100%; height: auto; }
 .message__sign .role { font-size: 17px; color: var(--text-muted); }
 .message__sign .name { font-size: 27px; font-weight: 700; margin-top: 6px; }
 
+/* 本文中のリンク。a は既定で color: inherit なので、指定しないと
+   地の文と見分けがつかない。 */
+.message__body a,
+.about__lead a,
+.project__desc a,
+.project__note a,
+.member-detail__bio a { color: var(--link); }
+.message__body a:hover,
+.about__lead a:hover,
+.project__desc a:hover,
+.project__note a:hover,
+.member-detail__bio a:hover { text-decoration: underline; }
+
 /* ===== Latest posts ===== */
 .home-cards {
   display: grid;
@@ -228,7 +243,7 @@ img { max-width: 100%; height: auto; }
 .home-card__cat { color: var(--accent); font-weight: 700; }
 .home-card__title { font-size: 17px; font-weight: 700; line-height: 1.5; margin-top: 8px; }
 .home-card:hover .home-card__title { color: var(--accent); }
-.more-link { display: inline-block; margin-top: 36px; font-size: 16px; font-weight: 700; color: var(--accent); }
+.more-link { display: inline-block; margin-top: 36px; font-size: 16px; font-weight: 700; color: var(--link); }
 .more-link::after { content: " →"; }
 
 /* ===== Sub nav（私たちについて/メンバー/お問い合わせ クラスタ） ===== */
@@ -402,12 +417,12 @@ img { max-width: 100%; height: auto; }
 .project ul { margin: 14px 0 0 22px; font-size: 15px; color: #444; }
 .project ul li { margin: 6px 0; }
 .project__note { margin-top: 14px; font-size: 15px; color: #333; }
-.project__link { display: inline-block; margin-top: 18px; font-weight: 700; color: var(--accent); }
+.project__link { display: inline-block; margin-top: 18px; font-weight: 700; color: var(--link); }
 .project__link::after { content: " →"; }
 
 /* ===== Contact links ===== */
 .contact__links { display: flex; gap: 20px; margin-top: 24px; font-size: 16px; font-weight: 700; }
-.contact__links a { color: var(--accent); }
+.contact__links a { color: var(--link); }
 .contact__links a:hover { text-decoration: underline; }
 
 /* ===== Shared footer ===== */
