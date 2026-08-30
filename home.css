@@ -7,19 +7,11 @@
    単にフォントを並べる指定だと「Noto Sans JP にも英数字が入っている」ため、
    環境によって半角がどちらで出るかが揺れる。unicode-range で Helvetica Neue の
    適用範囲を半角に限定し、そこから外れる文字は必ず Noto Sans JP に落とす。
-   ウェイトごとに実体が異なるため 400 / 500 / 700 を個別に宣言する。       */
+   ウェイトごとに実体が異なるため、サイトで使う 400 と 700 を個別に宣言する。 */
 @font-face {
   font-family: "PMI Latin";
   src: local("Helvetica Neue"), local("HelveticaNeue"), local("Helvetica");
   font-weight: 400;
-  font-style: normal;
-  unicode-range: U+0020-007E, U+00A0-00FF;
-}
-@font-face {
-  font-family: "PMI Latin";
-  src: local("Helvetica Neue Medium"), local("HelveticaNeue-Medium"),
-       local("Helvetica Neue"), local("Helvetica");
-  font-weight: 500;
   font-style: normal;
   unicode-range: U+0020-007E, U+00A0-00FF;
 }
@@ -126,8 +118,8 @@ img { max-width: 100%; height: auto; }
 .hero h1 {
   /* 画面幅に応じて滑らかに変化（狭い端末〜大型ディスプレイまで1本の指定で対応） */
   font-size: clamp(32px, 5.2vw, 68px);
-  /* 太さを落として、大きさに頼らない静かな見出しにする */
-  font-weight: 500;
+  /* 太字にしない。大きさだけで見出しとして立たせる。 */
+  font-weight: 400;
   line-height: 1.32;
   letter-spacing: -0.02em;
   max-width: 15em;

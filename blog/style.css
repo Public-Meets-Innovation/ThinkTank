@@ -2,19 +2,12 @@
 
 /* ===== 文字種によるフォントの割り当て（home.css と同一のルール） =====
    半角（ASCII / Latin-1）→ Helvetica Neue、全角（日本語）→ Noto Sans JP。
-   unicode-range で Helvetica Neue を半角に限定し、範囲外は Noto Sans JP に落とす。 */
+   unicode-range で Helvetica Neue を半角に限定し、範囲外は Noto Sans JP に落とす。
+   ウェイトはサイトで使う 400 と 700 のみ宣言する。 */
 @font-face {
   font-family: "PMI Latin";
   src: local("Helvetica Neue"), local("HelveticaNeue"), local("Helvetica");
   font-weight: 400;
-  font-style: normal;
-  unicode-range: U+0020-007E, U+00A0-00FF;
-}
-@font-face {
-  font-family: "PMI Latin";
-  src: local("Helvetica Neue Medium"), local("HelveticaNeue-Medium"),
-       local("Helvetica Neue"), local("Helvetica");
-  font-weight: 500;
   font-style: normal;
   unicode-range: U+0020-007E, U+00A0-00FF;
 }
@@ -250,7 +243,7 @@ img {
 
 .post__cat {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .post__thumb {
@@ -281,7 +274,7 @@ img {
   margin-top: 18px;
   font-size: 15px;
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .post__more::after {
