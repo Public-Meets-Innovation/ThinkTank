@@ -72,6 +72,7 @@ group: staff        # leadership または staff
 order: 3            # 並び順（小さいほど先）
 field: 専門領域      # 任意
 twitter: account    # 任意。@は不要。書くとアイコンが出ます
+website: https://example.com   # 任意。個人サイト。書くとアイコンが出ます
 photo: assets/yamada.jpg   # 任意
 ---
 
