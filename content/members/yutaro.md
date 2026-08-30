@@ -7,6 +7,7 @@ role: Head of Research
 group: staff
 order: 1
 field: 社会学／社会とテクノロジー
-twitter: yutaro_0518
+Twitter: yutaro_0518
+website: https://yutaro0518.com/
 photo: assets/member/yutaro.png
 ---
