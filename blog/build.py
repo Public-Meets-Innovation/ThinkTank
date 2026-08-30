@@ -297,9 +297,9 @@ def date_ja(iso):
 
 def render_article(p):
     # 記事は blog/<slug>/index.html に置き、URLから .html を無くす。
-    # blog/ 直下より1段深くなるので、本文中の images/... も1段ぶん持ち上げる。
+    # blog/ 直下より1段深くなるので、本文中の images/... や pdf/... も1段ぶん持ち上げる。
     blog_prefix = "../"
-    body_html = re.sub(r'(src|href)="images/', rf'\1="{blog_prefix}images/',
+    body_html = re.sub(r'(src|href)="(images|pdf)/', rf'\1="{blog_prefix}\2/',
                        p["body_html"])
     # 記事上部のヒーロー画像は本文先頭画像（＝サムネイル）と重複するため出力しない。
     # thumbnail は一覧カードのサムネイルとしてのみ使用する。
