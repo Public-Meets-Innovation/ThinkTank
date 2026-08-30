@@ -1,7 +1,7 @@
 ---
 title: "ThinkTank with Media―ナラティブの時代に、シンクタンクは何を担うのか―"
 date: 2026-09-01
-category: "調査レポート"
+category: "論考"
 excerpt: "本稿は、PMI ThinkTankが自らの位置と機能を再定義するために書かれたポジションペーパーである。"
 thumbnail: images/20260901_positionpaper/20260901_positionpaper.png
 OG image: images/20260901_positionpaper/20260901_positionpaper.png
