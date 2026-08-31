@@ -459,6 +459,22 @@ WEBSITE_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="none" '
                 '<path d="M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9"/>'
                 '<path d="M12 3C9.5 5.7 8.2 8.7 8.2 12s1.3 6.3 3.8 9"/></svg>')
 
+# researchmap 用のアイコン（研究業績＝書物を模した汎用のアイコン）
+RESEARCHMAP_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="none" '
+                    'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+                    'stroke-linejoin="round" aria-hidden="true">'
+                    '<path d="M3 4.5h6a3 3 0 0 1 3 3v12a2.4 2.4 0 0 0-2.4-2.4H3z"/>'
+                    '<path d="M21 4.5h-6a3 3 0 0 0-3 3v12a2.4 2.4 0 0 1 2.4-2.4H21z"/>'
+                    '</svg>')
+
+def researchmap_url(value):
+    """researchmap は ID だけ書けばよい（例: researchmap: yutaro_ueno）。
+    URL をそのまま書かれても動くようにしておく。"""
+    v = value.strip()
+    if v.startswith("http://") or v.startswith("https://"):
+        return html.escape(v)
+    return "https://researchmap.jp/" + html.escape(v.strip("/"))
+
 def load_members():
     """content/members/*.md を読む。ファイル名がそのまま個人ページのURLになる。
     group（leadership / staff）で分け、order の小さい順に並べる。"""
@@ -480,6 +496,7 @@ def member_cards(members, prefix="../"):
         name, role = m["name"], m["role"]
         field, photo = m.get("field", ""), m.get("photo", "")
         twitter, website = m.get("twitter", ""), m.get("website", "")
+        researchmap = m.get("researchmap", "")
 
         media = (f'<img src="{prefix}{html.escape(photo)}" alt="" />'
                  if photo else html.escape(name.strip()[0]))
@@ -497,6 +514,11 @@ def member_cards(members, prefix="../"):
                 f'<a class="member-card__icon" href="{html.escape(website)}" '
                 f'target="_blank" rel="noopener" '
                 f'aria-label="{html.escape(name)}の個人サイト">{WEBSITE_ICON}</a>')
+        if researchmap:
+            actions.append(
+                f'<a class="member-card__icon" href="{researchmap_url(researchmap)}" '
+                f'target="_blank" rel="noopener" '
+                f'aria-label="{html.escape(name)}のresearchmap">{RESEARCHMAP_ICON}</a>')
         # 個人ページは全員分を生成しているので View Bio は常に出す
         actions.append(
             f'<a class="member-card__bio" href="{prefix}members/'
@@ -720,7 +742,7 @@ def render_member_pages(members):
                  if photo else html.escape(m["name"].strip()[0]))
         field = (f'\n          <div class="member-detail__field">{html.escape(m["field"])}</div>'
                  if m.get("field") else "")
-        # Twitter と個人サイトのリンク。設定した人にだけ出る。
+        # Twitter・個人サイト・researchmap のリンク。設定した人にだけ出る。
         links = []
         if m.get("twitter"):
             links.append(
@@ -735,6 +757,12 @@ def render_member_pages(members):
                 f'href="{html.escape(m["website"])}" '
                 f'target="_blank" rel="noopener">{WEBSITE_ICON}'
                 f'<span>{html.escape(label)}</span></a>')
+        if m.get("researchmap"):
+            links.append(
+                f'<a class="member-detail__link" '
+                f'href="{researchmap_url(m["researchmap"])}" '
+                f'target="_blank" rel="noopener">{RESEARCHMAP_ICON}'
+                f'<span>researchmap</span></a>')
         twitter = ('\n          <div class="member-detail__links">'
                    + "".join(links) + '</div>') if links else ""
         body = f"""  <section class="section" id="member-detail">
