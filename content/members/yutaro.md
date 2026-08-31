@@ -10,6 +10,7 @@ order: 1
 field: 社会学／社会とテクノロジー
 twitter: yutaro_0518
 website: https://yutaro0518.com/
+researchmap: https://researchmap.jp/yutaro0518
 photo: assets/member/yutaro.png
 ---
 2000年、東京生まれ。

@@ -9,6 +9,7 @@ group: leadership
 order: 2
 website: https://yusuketanaka-vernacular.netlify.app/
 twitter: YusukeT1215
+researchmap: https://researchmap.jp/yusuke-tanaka1215
 photo: assets/member/tanaka.png
 ---
 1989年奈良県大塔村生まれ。
