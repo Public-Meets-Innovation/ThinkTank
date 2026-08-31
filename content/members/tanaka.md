@@ -7,6 +7,7 @@ name: 田中 佑典
 role: Executive Director
 group: leadership
 order: 2
+field: 公共政策学／環境社会学
 website: https://yusuketanaka-vernacular.netlify.app/
 twitter: YusukeT1215
 researchmap: https://researchmap.jp/yusuke-tanaka1215
