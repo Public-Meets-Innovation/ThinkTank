@@ -9,6 +9,7 @@ group: staff
 order: 2
 field: ポスト・デジタル社会／テクノロジーと法
 twitter: kobayashihaya
+photo: assets/member/kobayashi.png
 ---
 早稲田大学 佐古和恵研究室にて、暗号・プライバシー技術を専攻し、子どものデータ保護について研究。
 
