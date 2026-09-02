@@ -8,6 +8,9 @@ hero:
   body: PMI ThinkTankは、独自の調査と人文・社会科学の知に基づき、次の時代のための社会思想と価値観を構想し、その実現に向けた議論の土台をつくるシンクタンクです。
   cta_label: 最新の調査・研究を読む
   cta_href: blog/
+  # ヒーロー横の Featured 枠に出す記事（blog/posts/ のファイル名から .md を除いたもの）。
+  # 書かなければ自動的に最新記事にフォールバックする。
+  featured: 2026-09-01-thinktank-with-media
 
 latest:
   eyebrow: Blog

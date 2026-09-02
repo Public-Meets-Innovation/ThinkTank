@@ -31,13 +31,15 @@
   --text: #1a1a1a;
   --text-muted: #7a7a7a;
   --line: #ececec;
-  /* ベースのネイビー1色（ヒーロー・フッターの面）とアクセント1色のみ。
+  /* ベースのネイビー1色（フッターの面）とアクセント1色のみ。
      旧 --accent-dark（濃いティール）はネイビーに統合し、色数を増やさない。 */
   --navy: #0F2233;
   --accent: #1a5f7a;
   /* 本文中のリンクなど、リンクとして読ませるテキストの色 */
   --link: #3676f7;
   --accent-dark: var(--navy);
+  /* ヒーローだけの面。本文リンク色と同じ値だが、意味が違う（面の色）ので変数を分ける。 */
+  --hero-bg: #3676f7;
   --bg: #ffffff;
   --max: 1080px;
 }
@@ -104,36 +106,40 @@ img { max-width: 100%; height: auto; }
 .nav__links a:hover { color: var(--text); }
 .nav__links a.is-active { color: var(--text); font-weight: 700; border-bottom: 2px solid var(--accent); }
 
-/* ===== Hero ===== */
+/* ===== Hero =====
+   フルスクリーンの単色ブロック＋中央寄せの巨大見出し、というプロダクトLPの型から離れ、
+   雑誌の巻頭特集のように「本文（左）＋最新の主要レポート1本（右・Featured）」を
+   横に並べるレイアウトにしている。 */
 .hero {
-  /* グラデーションを廃してフラットな単色に。装飾（画像・テクスチャ・図形）は置かない。
-     #0F2233 と白のコントラスト比は約 16.5:1（WCAG AA の 4.5:1 を大きく満たす）。 */
-  background: var(--navy);
+  background: var(--hero-bg);
   color: #fff;
-  /* CTA下の余りを詰める。次セクションの見出しがわずかに覗く高さ。
-     余白そのものは残し、削るのは「余り」の部分だけ。 */
-  min-height: 62vh;
-  display: flex;
-  align-items: center;
-  padding: 88px 0 96px;
+  padding: 64px 0 56px;
+}
+.hero__grid {
+  display: grid;
+  /* 本文列は見出し2行目の実サイズぶんだけ（auto）。余った横幅はすべて
+     Featured 側（1fr）に渡し、記事画像を大きく見せる。 */
+  grid-template-columns: auto 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.hero__copy {
+  /* 見出し2行目「次の時代の社会思想を構想する」（全角14文字）の幅に合わせて、
+     本文の折り返し幅も揃える。h1 の font-size と同じ clamp を14倍している。 */
+  max-width: clamp(420px, 50.4vw, 644px);
 }
 .hero h1 {
-  /* 画面幅に応じて滑らかに変化（狭い端末〜大型ディスプレイまで1本の指定で対応） */
-  font-size: clamp(32px, 5.2vw, 68px);
-  /* 太字にしない。大きさだけで見出しとして立たせる。 */
-  font-weight: 400;
-  line-height: 1.32;
-  letter-spacing: -0.02em;
-  max-width: 15em;
+  font-size: clamp(30px, 3.6vw, 46px);
+  font-weight: 700;
+  line-height: 1.38;
+  letter-spacing: -0.005em;
 }
 /* 節ごとにまとまって折り返す（節の途中で切れないようにする） */
 .hero h1 span { display: inline-block; }
 .hero p {
-  margin-top: 30px;
-  font-size: clamp(16px, 1.5vw, 20px);
+  margin-top: 24px;
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.88);
-  /* 1行あたり概ね30〜38文字に収める */
-  max-width: 42em;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -146,20 +152,41 @@ img { max-width: 100%; height: auto; }
 .hero__cta {
   display: inline-flex;
   align-items: center;
-  margin-top: 40px;
-  /* 塗りではなく白のアウトライン。角丸はごく浅く。 */
-  border: 1px solid #fff;
-  border-radius: 3px;
-  background: transparent;
+  gap: 8px;
+  margin-top: 32px;
+  font-size: 15px;
+  font-weight: 700;
   color: #fff;
-  font-weight: 400;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  padding: 15px 32px;
-  transition: background-color 0.15s, color 0.15s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  padding-bottom: 3px;
+  transition: color 0.15s, border-color 0.15s;
 }
-/* ホバーで白ベタ反転 */
-.hero__cta:hover { background: #fff; color: var(--navy); }
+.hero__cta::after { content: " →"; }
+.hero__cta:hover { color: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.9); }
+
+/* Featured: 最新の主要レポートを1本、画像とタイトルだけで大きく見せる。
+   地の色が濃いので、カード自体は白地にして視線を受け止める。 */
+.hero__feature {
+  display: block;
+  background: #fff;
+  padding: 24px;
+  border-radius: 2px;
+}
+.hero__feature-thumb {
+  display: block;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  background: #eee;
+  margin-bottom: 16px;
+}
+.hero__feature-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.hero__feature-title {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text);
+}
+.hero__feature:hover .hero__feature-title { color: var(--accent); }
 
 /* ===== Section ===== */
 .section { padding: 88px 0; }
@@ -220,25 +247,22 @@ img { max-width: 100%; height: auto; }
 .project__note a:hover,
 .member-detail__bio a:hover { text-decoration: underline; }
 
-/* ===== Latest posts ===== */
+/* ===== Latest posts =====
+   角丸・ホバーで浮き上がるカードは廃止。罫線で区切った記事一覧にし、
+   ホバーは画像の微ズームとタイトル色の変化だけに留める。 */
 .home-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  gap: 0 32px;
 }
 .home-card {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.15s, box-shadow 0.15s;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
 }
-.home-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
 .home-card__thumb { display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #eef3f4; }
-.home-card__thumb img { width: 100%; height: 100%; object-fit: cover; }
-.home-card__body { padding: 20px; }
+.home-card__thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+.home-card:hover .home-card__thumb img { transform: scale(1.03); }
+.home-card__body { padding-top: 16px; }
 .home-card__meta { display: flex; gap: 10px; font-size: 13px; color: var(--text-muted); }
 .home-card__cat { color: var(--accent); font-weight: 700; }
 .home-card__title { font-size: 17px; font-weight: 700; line-height: 1.5; margin-top: 8px; }
@@ -456,7 +480,9 @@ img { max-width: 100%; height: auto; }
   .nav__inner { flex-wrap: wrap; gap: 8px 20px; }
   .nav__links { gap: 16px; font-size: 14px; }
   .section { padding: 60px 0; }
-  .hero { min-height: 0; padding: 88px 0 96px; }
+  .hero { padding: 44px 0 40px; }
+  .hero__grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero__copy { max-width: none; }
   .project { padding: 24px; }
   .subnav { gap: 16px; font-size: 14px; flex-wrap: wrap; }
   .members-grid { grid-template-columns: 1fr; gap: 16px; }

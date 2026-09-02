@@ -571,9 +571,10 @@ def site_shell(title, active, body_html, prefix, canonical_path, description="")
 </html>
 """
 
-def home_cards(posts, n=3):
+def home_cards(posts, n=3, exclude_slug=None):
+    shown = [p for p in posts if p["slug"] != exclude_slug]
     cards = []
-    for p in posts[:n]:
+    for p in shown[:n]:
         link = f'blog/{p["slug"]}/'
         # トップはサイトルート。thumbnail 未指定なら既定画像にフォールバックする。
         thumb = (f'<a href="{link}" class="home-card__thumb">'
@@ -603,12 +604,35 @@ def section_open(sec):
 
 def render_index_page(page, posts):
     hero, latest = page["hero"], page["latest"]
-    cards = home_cards(posts, latest.get("count", 3))
+
+    # hero.featured にスラッグ（記事フォルダ名）を書くと、その記事をヒーロー横の
+    # Featured 枠に差し込む。書かなければ最新記事にフォールバックするので、
+    # 未設定でも壊れない。「最新の調査・研究」のカード列とは重複しないよう、
+    # featured に選ばれた記事はそちらの一覧から除く。
+    featured_slug = hero.get("featured")
+    featured = next((p for p in posts if p["slug"] == featured_slug), None)
+    if featured is None and posts:
+        featured = posts[0]
+
+    cards = home_cards(posts, latest.get("count", 3),
+                        exclude_slug=featured["slug"] if featured else None)
+
+    feature_html = ""
+    if featured:
+        link = f'blog/{featured["slug"]}/'
+        feature_html = f"""
+      <a href="{link}" class="hero__feature">
+        <div class="hero__feature-thumb"><img src="{html.escape(thumb_src(featured, "blog/", ""))}" alt="" /></div>
+        <div class="hero__feature-title">{html.escape(featured["title"])}</div>
+      </a>"""
+
     return f"""  <header class="hero">
-    <div class="wrap">
-      <h1>{clause_spans(hero["heading"])}</h1>
-      <p>{clause_spans(hero["body"])}</p>
-      <a href="{html.escape(hero["cta_href"])}" class="hero__cta">{html.escape(hero["cta_label"])}</a>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <h1>{clause_spans(hero["heading"])}</h1>
+        <p>{clause_spans(hero["body"])}</p>
+        <a href="{html.escape(hero["cta_href"])}" class="hero__cta">{html.escape(hero["cta_label"])}</a>
+      </div>{feature_html}
     </div>
   </header>
 
